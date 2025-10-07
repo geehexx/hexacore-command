@@ -6,7 +6,7 @@ auto_execution_mode: 3
 **Objective:** To autonomously complete all tasks defined in `docs/MVP_Roadmap.md`.
 **Process:**
     1. **Agent:** For each task in `docs/MVP_Roadmap.md`:
-        - Invoke the `/Implement New Game Logic workflow` for the task.
+        - Invoke the /implement-new-game-logic workflow for the task.
         - On successful completion, update the roadmap by checking off the item.
     2. **CHECKPOINT: MVP Completion Review.**
         - **Presentation:** "The MVP Roadmap is complete. All core engine features have been implemented and documented."
