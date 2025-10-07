@@ -4,7 +4,7 @@ This document tracks the initial project setup. Once all items are checked, this
 
 ## Phase 1: Core Engine Foundations
 
-* [ ] **Task 1:** Set up initial benchmarking infrastructure with `pytest-benchmark`.
+* [x] **Task 1:** Set up initial benchmarking infrastructure with `pytest-benchmark`.
 * [ ] **Task 2:** Implement Core Datatypes (`HexCoord`, `Component` base classes).
 * [ ] **Task 3:** Implement Game World (`World`) and `EventBus`.
 * [ ] **Task 4:** Implement Turn & Token Systems (`TurnManager`, `StatsComponent`, `TurnComponent`).

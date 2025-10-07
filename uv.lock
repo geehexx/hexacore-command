@@ -235,6 +235,11 @@ dev = [
     { name = "types-pygments" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "pytest-describe" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "arcade", specifier = "==3.0.0" },
@@ -250,6 +255,9 @@ requires-dist = [
     { name = "types-pygments", marker = "extra == 'dev'" },
 ]
 provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest-describe", specifier = ">=2.2.0" }]
 
 [[package]]
 name = "httpcore"
@@ -684,6 +692,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/28/08/e6b0067efa9a1f2a1eb3043ecd8a0c48bfeb60d3255006dcc829d72d5da2/pytest-benchmark-4.0.0.tar.gz", hash = "sha256:fb0785b83efe599a6a956361c0691ae1dbb5318018561af10f3e915caa0048d1", size = 334641, upload-time = "2022-10-25T21:21:55.686Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/4d/a1/3b70862b5b3f830f0422844f25a823d0470739d994466be9dbbbb414d85a/pytest_benchmark-4.0.0-py3-none-any.whl", hash = "sha256:fdb7db64e31c8b277dff9850d2a2556d8b60bcb0ea6524e36e28ffd7c87f71d6", size = 43951, upload-time = "2022-10-25T21:21:53.208Z" },
+]
+
+[[package]]
+name = "pytest-describe"
+version = "2.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/61/58/4079baf5a7937159aa59b2f696f8d61c55a6ae4df87bd9ed49e7e130df21/pytest-describe-2.2.0.tar.gz", hash = "sha256:39bb05eb90f2497d9ca342ef9a0b7fa5bada7e58505aec33f66d661d631955b7", size = 10907, upload-time = "2024-02-10T15:30:35.224Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5d/95/2990d6e3e777be36690700b524d7daf44c9562158d1af6a8f85a6236f22c/pytest_describe-2.2.0-py3-none-any.whl", hash = "sha256:bd9e2c73acb4b9522a8400823d98f5b6a081667d3bfd7243a8598336896b544d", size = 6940, upload-time = "2024-02-10T15:30:33.451Z" },
 ]
 
 [[package]]

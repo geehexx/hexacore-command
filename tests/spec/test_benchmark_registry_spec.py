@@ -22,7 +22,7 @@ class FakeBenchmarkRunner:
         return result
 
 
-def describe_benchmark_registry():
+def describe_benchmark_registry_registration():
     def it_registers_and_lists_benchmarks() -> None:
         registry = BenchmarkRegistry()
 
@@ -33,6 +33,8 @@ def describe_benchmark_registry():
         assert registry.names == ("alpha",)
         assert registry.get("alpha") is alpha
 
+
+def describe_benchmark_registry_duplicate_protection():
     def it_prevents_duplicate_registration() -> None:
         registry = BenchmarkRegistry()
 
@@ -43,6 +45,8 @@ def describe_benchmark_registry():
         with pytest.raises(ValueError):
             registry.register("alpha", alpha)
 
+
+def describe_benchmark_registry_execution():
     def it_runs_registered_benchmarks_with_runner() -> None:
         registry = BenchmarkRegistry()
 
@@ -57,6 +61,24 @@ def describe_benchmark_registry():
 
         runner = FakeBenchmarkRunner()
         results = registry.run_all(runner)
+
+        assert results == {"alpha": 1, "beta": 2}
+        assert [call.name for call in runner.calls] == ["alpha", "beta"]
+
+    def it_runs_benchmarks_with_pytest_style_runner() -> None:
+        registry = BenchmarkRegistry()
+
+        def alpha() -> int:
+            return 1
+
+        def beta() -> int:
+            return 2
+
+        registry.register("alpha", alpha)
+        registry.register("beta", beta)
+
+        runner = FakeBenchmarkRunner()
+        results = registry.run_with_pytest_benchmark(runner)
 
         assert results == {"alpha": 1, "beta": 2}
         assert [call.name for call in runner.calls] == ["alpha", "beta"]

@@ -42,5 +42,10 @@ class BenchmarkRegistry:
             results[name] = effective_runner(func)
         return results
 
+    def run_with_pytest_benchmark(self, benchmark: BenchmarkRunner) -> dict[str, Any]:
+        """Execute benchmarks using a ``pytest-benchmark`` style callable."""
+        return self.run_all(benchmark)
+
 
 # TECH_DEBT: Extend registry to capture benchmark metadata (tags, budgets).
+# TECH_DEBT: Allow injecting benchmark-specific kwargs (e.g., warmup, rounds).
