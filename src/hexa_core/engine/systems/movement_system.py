@@ -2,15 +2,22 @@
 
 from __future__ import annotations
 
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable, cast
 
 import esper
 
 from hexa_core.engine.components import PositionComponent
 
+if TYPE_CHECKING:
+    from esper import World as EsperWorld  # type: ignore[attr-defined]
+else:
+    EsperWorld = esper.World
+
 
 class MovementSystem(esper.Processor):
     """Placeholder movement system."""
+
+    world: EsperWorld  # Provided by esper.Processor
 
     def process(self, *_: object, **__: object) -> None:  # pragma: no cover - placeholder
         """Process movement for entities with a path to follow."""
@@ -20,4 +27,5 @@ class MovementSystem(esper.Processor):
 
     def _iter_positions(self) -> Iterable[tuple[int, PositionComponent]]:
         """Iterate over entities with `PositionComponent`."""
-        return self.world.get_components(PositionComponent)
+        components = self.world.get_components(PositionComponent)
+        return cast(Iterable[tuple[int, PositionComponent]], components)

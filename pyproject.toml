@@ -1,9 +1,9 @@
 [project]
 name = "hexa_core"
 version = "0.1.0"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = [
-  "arcade==2.6.17",
+  "arcade==3.0.0",
   "esper==3.3.0",
   "sly==0.5"
 ]
@@ -11,11 +11,11 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "pytest==7.4.3",
-  "spec-kit==1.0.0",
+  "specify-cli @ git+https://github.com/github/spec-kit.git",
   "ruff==0.1.6",
   "mypy==1.7.0",
   "pre-commit==3.5.0",
-  "markdownlint-cli==0.37.0",
+  "pymarkdownlnt>=0.9.18",
   "pytest-benchmark==4.0.0",
   "types-Pygments"
 ]
@@ -25,13 +25,13 @@ pythonpath = "src"
 testpaths = "tests"
 
 [tool.ruff]
-line-length = 120
+line-length = 250
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "C", "B"]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true

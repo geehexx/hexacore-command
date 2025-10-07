@@ -8,7 +8,7 @@ class ScriptRunner:
 
     def __init__(self) -> None:
         # TODO: Initialize lexer and parser built with SLY.
-        self._program = None
+        self._program: str | None = None
 
     def load(self, source: str) -> None:
         """Load Hexa-Script source code."""

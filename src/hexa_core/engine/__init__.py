@@ -6,4 +6,5 @@ __all__ = [
     "world",
     "event_bus",
     "script_runner",
+    "benchmarking",
 ]
