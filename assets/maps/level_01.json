@@ -1,0 +1,55 @@
+{
+  "name": "First Encounter",
+  "grid_size": {
+    "width": 15,
+    "height": 15
+  },
+  "tiles": [
+    {
+      "type": "wall",
+      "q": 0,
+      "r": 1
+    },
+    {
+      "type": "wall",
+      "q": 0,
+      "r": 2
+    }
+  ],
+  "entities": [
+    {
+      "name": "Player",
+      "components": {
+        "Position": {
+          "q": -2,
+          "r": 5
+        },
+        "Stats": {
+          "health": 100,
+          "speed": 50,
+          "processor": 100
+        },
+        "Script": {
+          "path": "assets/scripts/player_default.hxc"
+        }
+      }
+    },
+    {
+      "name": "Enemy Drone",
+      "components": {
+        "Position": {
+          "q": 2,
+          "r": -5
+        },
+        "Stats": {
+          "health": 50,
+          "speed": 25,
+          "processor": 50
+        },
+        "Script": {
+          "path": "assets/scripts/enemy_dummy.hxc"
+        }
+      }
+    }
+  ]
+}

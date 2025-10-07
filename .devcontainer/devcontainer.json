@@ -1,0 +1,16 @@
+{
+  "name": "Hexa-Core Command Dev",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "davidanson.vscode-markdownlint"
+      ]
+    }
+  },
+  "postCreateCommand": "pip install uv && uv pip install -r requirements-dev.txt && pre-commit install",
+  "remoteUser": "vscode"
+}

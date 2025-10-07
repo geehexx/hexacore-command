@@ -1,0 +1,14 @@
+{
+  "sprites": {
+    "player_bot": "assets/sprites/tank_bigRed.png",
+    "enemy_bot_1": "assets/sprites/tank_huge.png"
+  },
+  "tiles": {
+    "floor": "assets/tiles/hex_dirt.png",
+    "wall": "assets/tiles/hex_stone.png"
+  },
+  "sounds": {
+    "attack_laser": "assets/sfx/laserSmall_001.wav",
+    "ui_click": "assets/sfx/click_001.wav"
+  }
+}
