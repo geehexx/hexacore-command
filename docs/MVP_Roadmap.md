@@ -7,7 +7,8 @@ This document tracks the initial project setup. Once all items are checked, this
 * [x] **Task 1:** Set up initial benchmarking infrastructure with `pytest-benchmark`.
 * [x] **Task 2:** Implement Core Datatypes (`HexCoord`, `Component` base classes).
   * Implemented `HexCoord.distance_to()` for axial metric and introduced a reusable `Component` mixin powering dataclass utilities (`to_dict`, `replace`).
-* [ ] **Task 3:** Implement Game World (`World`) and `EventBus`.
+* [x] **Task 3:** Implement Game World (`World`) and `EventBus`.
+  * Added `GameWorld` wrapper that provisions dedicated `esper` contexts and exposes event bus helpers, plus `EventBus` publish/subscribe tests.
 * [ ] **Task 4:** Implement Turn & Token Systems (`TurnManager`, `StatsComponent`, `TurnComponent`).
 * [ ] **Task 5:** Implement Hexa-Script Lexer, Parser, and `ScriptRunner` system.
 * [ ] **Task 6:** Implement Core Actions (`MovementSystem`, `CombatSystem`).
