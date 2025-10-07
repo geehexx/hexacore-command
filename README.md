@@ -17,40 +17,24 @@ This project is designed to be developed within a VS Code Dev Container.
 
 If you prefer running locally, install Python 3.11+, [uv](https://docs.astral.sh/uv/), and execute `uv pip install .[dev]` to reproduce the development environment.
 
-## Running the Game
+## Task Automation
 
-To launch the game, run the following command from the integrated terminal:
+This project standardizes developer workflows with [Task](https://taskfile.dev/). List all available targets via `task --list` or run the high-value tasks below:
 
-```bash
-python -m hexa_core.main
-```
+- `task game:run` launches the renderer entrypoint (`python -m hexa_core.main`).
+- `task test:unit` executes the full `pytest` suite.
+- `task test:spec` focuses on the `spec-kit` driven scenarios in `tests/spec/`.
+- `task test:benchmarks` runs the `pytest-benchmark` suite.
+- `task lint:all` runs Ruff, MyPy, and PyMarkdown in sequence.
+- `task ci:check` chains `task lint:all` and `task test:unit` to mirror CI expectations.
+- `task ci:benchmarks` executes the benchmark-only validation path.
 
-## **Running Tests**
-
-To run the full test suite:
-
-```bash
-uv run pytest
-```
-
-To run the benchmark tests:
-
-```bash
-uv run pytest --benchmark-only
-```
-
-To run the Markdown, lint, and type checks individually:
-
-```bash
-uv run pymarkdown scan .
-uv run ruff check .
-uv run mypy src/hexa_core
-```
+These targets wrap the canonical `uv` commands to ensure consistency across agents and contributors. If a new workflow emerges, prefer adding a Taskfile entry before documenting a raw command.
 
 ## **Architectural Overview**
 
 This project follows a strict set of architectural principles, enforced by Windsurf rules. Key decisions are documented in `docs/decisions`.
 
-* **Entity-Component-System (ECS):** Game logic is built around the `esper` ECS library.
-* **Logic-Renderer Separation:** The game engine (`src/hexa_core/engine`) is a pure, deterministic Python module, completely decoupled from the Arcade-based renderer (`src/hexa_core/renderer`).
-* **Event Bus:** Communication from the engine to the renderer is handled via a simple publish/subscribe event bus.
+- **Entity-Component-System (ECS):** Game logic is built around the `esper` ECS library.
+- **Logic-Renderer Separation:** The game engine (`src/hexa_core/engine`) is a pure, deterministic Python module, completely decoupled from the Arcade-based renderer (`src/hexa_core/renderer`).
+- **Event Bus:** Communication from the engine to the renderer is handled via a simple publish/subscribe event bus.

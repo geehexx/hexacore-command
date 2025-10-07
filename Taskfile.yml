@@ -1,0 +1,69 @@
+version: "3"
+
+vars:
+  UV: uv
+
+tasks:
+  default:
+    desc: Show all available tasks.
+    cmds:
+      - task --list
+    silent: true
+
+  game:run:
+    desc: Launch the Hexa-Core Command renderer entrypoint.
+    cmds:
+      - "{{.UV}} run python -m hexa_core.main"
+
+  test:unit:
+    desc: Run the full pytest suite, including spec-kit specs.
+    cmds:
+      - "{{.UV}} run pytest"
+
+  test:spec:
+    desc: Execute only spec-kit style tests in tests/spec/.
+    cmds:
+      - "{{.UV}} run pytest tests/spec"
+
+  test:benchmarks:
+    desc: Run the benchmark suite with pytest-benchmark.
+    cmds:
+      - "{{.UV}} run pytest --benchmark-only"
+
+  lint:ruff:
+    desc: Run Ruff linting and autofix validation.
+    cmds:
+      - "{{.UV}} run ruff check ."
+
+  lint:mypy:
+    desc: Type-check engine and supporting modules with MyPy.
+    cmds:
+      - "{{.UV}} run mypy src/hexa_core"
+
+  lint:markdown:
+    desc: Lint Markdown documentation with PyMarkdown.
+    cmds:
+      - "{{.UV}} run pymarkdown scan ."
+
+  lint:all:
+    desc: Run all linting tasks (Ruff, MyPy, Markdown).
+    deps:
+      - lint:ruff
+      - lint:mypy
+      - lint:markdown
+
+  ci:pre-commit:
+    desc: Run all pre-commit hooks across the repository.
+    cmds:
+      - "{{.UV}} run pre-commit run --all-files"
+
+  ci:check:
+    desc: Run linting and tests to validate CI requirements.
+    deps:
+      - lint:all
+      - test:unit
+
+  ci:benchmarks:
+    desc: Execute the benchmark suite for performance verification.
+    deps:
+      - test:benchmarks

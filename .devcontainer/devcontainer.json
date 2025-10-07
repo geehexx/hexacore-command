@@ -11,6 +11,6 @@
       ]
     }
   },
-  "postCreateCommand": "pip install uv && uv pip install -r requirements-dev.txt && pre-commit install",
+  "postCreateCommand": "bash -lc 'set -euo pipefail; curl -sSfL https://taskfile.dev/install.sh | sh -s -- -b /usr/local/bin; pip install uv; uv pip install -r requirements-dev.txt; pre-commit install'",
   "remoteUser": "vscode"
 }

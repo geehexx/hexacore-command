@@ -18,6 +18,11 @@ globs: tests/**/*.py, src/**/*.py, *.md, *.toml, *.yaml, *.json
 ## 6.3 Code Quality & Automation
 
 * **Tooling:** `Ruff`, `MyPy`, and `markdownlint` are the standard for quality, enforced by `pre-commit` hooks.
+* **Automation:** Use the Taskfile targets to execute repeatable workflows:
+  * `task lint:all` runs Ruff, MyPy, and PyMarkdown in sequence.
+  * `task test:unit` runs the full pytest suite.
+  * `task ci:check` chains linting and unit tests for CI validation.
+  * `task ci:benchmarks` runs the benchmark suite when performance validation is required.
 
 ## 6.4 Performance & Benchmarking
 
