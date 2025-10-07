@@ -5,7 +5,8 @@ This document tracks the initial project setup. Once all items are checked, this
 ## Phase 1: Core Engine Foundations
 
 * [x] **Task 1:** Set up initial benchmarking infrastructure with `pytest-benchmark`.
-* [ ] **Task 2:** Implement Core Datatypes (`HexCoord`, `Component` base classes).
+* [x] **Task 2:** Implement Core Datatypes (`HexCoord`, `Component` base classes).
+  * Implemented `HexCoord.distance_to()` for axial metric and introduced a reusable `Component` mixin powering dataclass utilities (`to_dict`, `replace`).
 * [ ] **Task 3:** Implement Game World (`World`) and `EventBus`.
 * [ ] **Task 4:** Implement Turn & Token Systems (`TurnManager`, `StatsComponent`, `TurnComponent`).
 * [ ] **Task 5:** Implement Hexa-Script Lexer, Parser, and `ScriptRunner` system.

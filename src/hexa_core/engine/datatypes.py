@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, is_dataclass, replace as dataclass_replace
+from typing import TypeVar, cast
 
 
 @dataclass(frozen=True)
@@ -23,3 +24,36 @@ class HexCoord:
             (0, 1),
         )
         return tuple(HexCoord(self.q + dq, self.r + dr) for dq, dr in directions)
+
+    def distance_to(self, other: "HexCoord") -> int:
+        """Return axial distance to another coordinate."""
+        dq = self.q - other.q
+        dr = self.r - other.r
+        return (abs(dq) + abs(dr) + abs(dq + dr)) // 2
+
+
+ComponentType = TypeVar("ComponentType", bound="Component")
+
+
+class Component:
+    """Base mixin for ECS components providing helper utilities."""
+
+    __slots__ = ()
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a shallow dictionary representation of the component."""
+        if not is_dataclass(self):  # pragma: no cover - defensive guard
+            msg = "Component instances must be dataclasses to use to_dict()"
+            raise TypeError(msg)
+        return asdict(self)
+
+    def replace(self: ComponentType, **changes: object) -> ComponentType:
+        """Return a new component instance with the provided immutable updates."""
+        try:
+            return cast(ComponentType, dataclass_replace(self, **changes))
+        except TypeError as exc:  # pragma: no cover - exercised via AttributeError path
+            raise AttributeError(str(exc)) from exc
+
+
+# TECH_DEBT: Evaluate memoizing neighbor tuples or pooling component copies if profiling reveals
+# allocation pressure during large-scale simulations.

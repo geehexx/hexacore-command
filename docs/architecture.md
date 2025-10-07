@@ -7,6 +7,7 @@ The architecture centers on a deterministic game engine and a decoupled renderer
 * Implements the Entity-Component-System (ECS) pattern using `esper`.
 * Maintains all deterministic game state and logic.
 * Communicates outward exclusively through the `EventBus`.
+* Exposes core datatypes such as `HexCoord` for hex-grid math and a reusable `Component` base mixin for ECS data classes.
 
 ## Renderer Layer (`src/hexa_core/renderer`)
 
