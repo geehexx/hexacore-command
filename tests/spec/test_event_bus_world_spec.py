@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections import deque
 
 import esper
-
 from hexa_core.engine.event_bus import EventBus
 from hexa_core.engine.world import GameWorld
 

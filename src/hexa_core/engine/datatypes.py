@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, is_dataclass, replace as dataclass_replace
-from typing import TypeVar, cast
+from dataclasses import asdict, dataclass, is_dataclass
+from dataclasses import replace as dataclass_replace
+from typing import Any, TypeVar, cast
 
 
 @dataclass(frozen=True)
@@ -40,17 +41,21 @@ class Component:
 
     __slots__ = ()
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> dict[str, Any]:
         """Return a shallow dictionary representation of the component."""
         if not is_dataclass(self):  # pragma: no cover - defensive guard
             msg = "Component instances must be dataclasses to use to_dict()"
             raise TypeError(msg)
-        return asdict(self)
+        return cast(dict[str, Any], asdict(cast(Any, self)))
 
     def replace(self: ComponentType, **changes: object) -> ComponentType:
         """Return a new component instance with the provided immutable updates."""
+        if not is_dataclass(self):  # pragma: no cover - defensive guard
+            msg = "Component instances must be dataclasses to use replace()"
+            raise TypeError(msg)
+
         try:
-            return cast(ComponentType, dataclass_replace(self, **changes))
+            return cast(ComponentType, dataclass_replace(cast(Any, self), **changes))
         except TypeError as exc:  # pragma: no cover - exercised via AttributeError path
             raise AttributeError(str(exc)) from exc
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import pytest
-
 from hexa_core.engine.datatypes import Component, HexCoord
 
 

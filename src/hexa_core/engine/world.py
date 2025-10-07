@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from itertools import count
 from typing import Any
@@ -31,7 +31,7 @@ class GameWorld:
             pass
 
     @contextmanager
-    def _activate_context(self) -> Callable[[], None]:  # type: ignore[override]
+    def _activate_context(self) -> Iterator[None]:
         previous = esper.current_world
         if previous == self.context_name:
             yield
