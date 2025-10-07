@@ -10,10 +10,12 @@ This project is an exploration of AI-assisted game development. The game itself 
 
 This project is designed to be developed within a VS Code Dev Container.
 
-1. Ensure you have Docker and the VS Code "Dev Containers" extension installed.
+1. Ensure you have Docker and the VS Code "Dev Containers" extension installed. The container image ships with Python 3.11 and all required tooling (including `uv`).
 2. Open this project folder in VS Code.
 3. When prompted, click "Reopen in Container".
 4. The container will build, install all dependencies, and set up pre-commit hooks automatically.
+
+If you prefer running locally, install Python 3.11+, [uv](https://docs.astral.sh/uv/), and execute `uv pip install .[dev]` to reproduce the development environment.
 
 ## Running the Game
 
@@ -28,13 +30,21 @@ python -m hexa_core.main
 To run the full test suite:
 
 ```bash
-pytest
+uv run pytest
 ```
 
 To run the benchmark tests:
 
 ```bash
-pytest --benchmark-only
+uv run pytest --benchmark-only
+```
+
+To run the Markdown, lint, and type checks individually:
+
+```bash
+uv run pymarkdown scan .
+uv run ruff check .
+uv run mypy src/hexa_core
 ```
 
 ## **Architectural Overview**
