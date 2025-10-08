@@ -11,6 +11,7 @@ globs: docs/**/*.md
 3. **Initiative Documents (`docs/initiatives/*.md`, `docs/decisions/*.md`):**
     * **Roadmaps:** Temporary checklists. Propose archival upon completion.
     * **Architectural Decision Records (ADRs):** Your primary tool for proposing and recording significant technical decisions. Follow the template in `ADR-0001`. Use the `[PLAN] Propose New ADR` workflow.
+    * All first mentions of an external library, tool, or methodology within a document MUST be hyperlinked to its official documentation or primary source URL.
 4. **Windsurf Artifacts (`.windsurf/rules/`, `.windsurf/workflows/`):**
     * Rule descriptions must avoid apostrophes to ensure the Windsurf IDE loads them.
     * Workflow definitions must avoid square brackets and follow the established schema for metadata.

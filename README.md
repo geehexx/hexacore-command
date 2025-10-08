@@ -24,7 +24,7 @@ This project standardizes developer workflows with [Task](https://taskfile.dev/)
 - `task game:run` launches the renderer entrypoint (`python -m hexa_core.main`).
 - `task test:unit` executes the full `pytest` suite.
 - `task test:spec` focuses on the `spec-kit` driven scenarios in `tests/spec/`.
-- `task test:benchmarks` runs the `pytest-benchmark` suite.
+- `task test:benchmarks` runs the CodSpeed-backed performance suite (`pytest --codspeed`).
 - `task lint:all` runs Ruff, MyPy, and PyMarkdown in sequence.
 - `task ci:check` chains `task lint:all` and `task test:unit` to mirror CI expectations.
 - `task ci:benchmarks` executes the benchmark-only validation path.

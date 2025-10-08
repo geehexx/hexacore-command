@@ -42,8 +42,8 @@ class BenchmarkRegistry:
             results[name] = effective_runner(func)
         return results
 
-    def run_with_pytest_benchmark(self, benchmark: BenchmarkRunner) -> dict[str, Any]:
-        """Execute benchmarks using a ``pytest-benchmark`` style callable."""
+    def run_with_pytest_codspeed(self, benchmark: BenchmarkRunner) -> dict[str, Any]:
+        """Execute benchmarks using a ``pytest-codspeed`` style callable."""
         return self.run_all(benchmark)
 
 

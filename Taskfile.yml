@@ -20,15 +20,30 @@ tasks:
     cmds:
       - "{{.UV}} run pytest"
 
+  test:unit:parallel:
+    desc: Run spec-kit tests in parallel using pytest-xdist.
+    cmds:
+      - "{{.UV}} run pytest -n auto tests/spec/"
+
   test:spec:
     desc: Execute only spec-kit style tests in tests/spec/.
     cmds:
       - "{{.UV}} run pytest tests/spec"
 
-  test:benchmarks:
-    desc: Run the benchmark suite with pytest-benchmark.
+  test:bdd:
+    desc: Execute BDD feature tests in tests/features/.
     cmds:
-      - "{{.UV}} run pytest --benchmark-only"
+      - "{{.UV}} run pytest tests/features"
+
+  test:benchmarks:
+    desc: Run the benchmark suite with pytest-codspeed in parallel.
+    cmds:
+      - "{{.UV}} run pytest --codspeed -n auto tests/benchmarks/"
+
+  test:property:
+    desc: Execute property-based tests.
+    cmds:
+      - "{{.UV}} run pytest tests/property"
 
   lint:ruff:
     desc: Run Ruff linting and autofix validation.

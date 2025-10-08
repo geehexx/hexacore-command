@@ -2,5 +2,5 @@
 
 * **Status:** Accepted
 * **Context:** We need a secure, sandboxed, and thematically appropriate way for players and level designers to define bot behavior.
-* **Decision:** Create a custom, BASIC-like language called "Hexa-Script" using the `sly` parsing library.
+* **Decision:** Create a custom, BASIC-like language called "Hexa-Script" using the [`sly`](https://sly.readthedocs.io/en/latest/) parsing library.
 * **Consequences:** Provides full control over the bot's capabilities and prevents security risks. Creates a fun, retro programming experience for the player.

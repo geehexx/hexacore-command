@@ -78,7 +78,7 @@ def describe_benchmark_registry_execution():
         registry.register("beta", beta)
 
         runner = FakeBenchmarkRunner()
-        results = registry.run_with_pytest_benchmark(runner)
+        results = registry.run_with_pytest_codspeed(runner)
 
         assert results == {"alpha": 1, "beta": 2}
         assert [call.name for call in runner.calls] == ["alpha", "beta"]

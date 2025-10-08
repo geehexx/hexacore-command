@@ -3,8 +3,10 @@
 * **Status:** Accepted
 * **Context:** While turn-based, the game's core loop involves complex calculations (pathfinding, ECS processing, script execution) that can scale in complexity. We must ensure the engine remains performant as features are added. This was a key learning from the `traffic-simulator` project.
 * **Decision:**
-  1. **Tooling:** We will use `pytest-benchmark` for all performance measurement.
-     The engine exposes `BenchmarkRegistry.run_with_pytest_benchmark()` to integrate registry scenarios directly with the plugin's runner callable.
+  1. **Tooling:** We will use `pytest-codspeed` for all performance measurement.
+     The engine exposes
+     `BenchmarkRegistry.run_with_pytest_codspeed()` to integrate registry scenarios
+     directly with the plugin's runner callable.
   2. **Requirement:** Performance-sensitive systems MUST be accompanied by benchmark tests located in `tests/benchmarks/`.
   3. **Initial Focus:** The initial systems identified for benchmarking are:
       * The main ECS `world.process()` loop.

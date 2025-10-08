@@ -1,0 +1,53 @@
+# Testing Playbook
+
+## Metadata
+
+| Key | Value |
+| --- | --- |
+| Topic | Hexa-Core Command Testing Architecture |
+| Keywords | testing, spec-kit, pytest-bdd, hypothesis, codspeed |
+| Related ADRs | [ADR-0005](../decisions/0005-performance-and-benchmarking-strategy.md) |
+| Key Libraries | [`pytest`](https://docs.pytest.org/), [`spec-kit`](https://github.com/github/spec-kit), [`pytest-bdd`](https://pytest-bdd.readthedocs.io/), [`hypothesis`](https://hypothesis.readthedocs.io/), [`pytest-codspeed`](https://docs.codspeed.io/docs/pytest/overview) |
+
+## Overview
+
+Hexa-Core Command relies on a layered testing strategy to keep the engine deterministic and observable. This playbook explains how each testing style is applied and which automation targets exercise them.
+
+## Spec Tests (`tests/spec/`)
+
+- **Purpose:** Drive engine code with TDD using `spec-kit` (`pytest-describe`).
+- **Structure:** Each file defines `describe_*` blocks with nested behavior-focused tests.
+- **Execution:** Run `task test:spec` for the spec-only subset or `task test:unit` for the entire suite.
+
+## Behavior-Driven Development (`tests/features/`)
+
+- **Purpose:** Express player-visible behavior via Gherkin scenarios executed with `pytest-bdd`.
+- **Structure:** Feature files live alongside step definition modules. Steps must integrate with real engine services (e.g., `GameWorld`, `EventBus`).
+- **Execution:** Run `task test:bdd` or target individual features with `uv run pytest tests/features/<feature>.py`.
+- **Reference:** See `tests/features/test_bot_movement_bdd.py` for an end-to-end move scheduling example.
+
+## Property-Based Testing (`tests/property/`)
+
+- **Purpose:** Ensure algorithms remain correct across broad input domains using Hypothesis strategies.
+- **Structure:** Property tests share common strategy builders per datatype or system. Store helpers alongside tests when reuse is limited.
+- **Execution:** Run `task test:property` for the property suite. Integrate property tests into CI by adding the task to composite workflows as needed.
+- **Reference:** `tests/property/test_hex_coord_property.py` validates `HexCoord` symmetry and neighbor relationships.
+- **Next Steps:** Extend property suites to cover movement and combat systems once their implementations are stabilized so invariants around range, cooldowns, and damage can be encoded.
+
+## Performance Benchmarks (`tests/benchmarks/`)
+
+- **Purpose:** Track performance regressions through CodSpeed-backed benchmarks.
+- **Structure:** Register benchmark callables in modules and execute them through `BenchmarkRegistry`.
+- **Execution:** Run `task test:benchmarks` (CodSpeed) or `task ci:benchmarks` during CI.
+- **Reference:** Consult `docs/testing/pytest_codspeed.md` for deeper integration guidance.
+
+## Workflow Summary
+
+| Suite | Command | Notes |
+| --- | --- | --- |
+| Spec | `task test:spec` | Unit-level coverage with `spec-kit`. |
+| BDD | `task test:bdd` | User-facing acceptance behavior. |
+| Property | `task test:property` | Hypothesis-driven invariants. |
+| Benchmarks | `task test:benchmarks` | CodSpeed parallel benchmarking. |
+
+Keep this table aligned with `Taskfile.yml` whenever new suites or commands are introduced.

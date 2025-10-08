@@ -13,7 +13,7 @@ globs: tests/**/*.py, src/**/*.py, *.md, *.toml, *.yaml, *.json
 
 ## 6.2 Test-Driven Development (TDD)
 
-* **Mandate:** All game logic in `src/hexa_core/engine/` MUST be developed via a strict TDD workflow using `spec-kit`. See [spec-kit documentation](https://github.com/github/spec-kit).
+* **Mandate:** All game logic in `src/hexa_core/engine/` MUST be developed via a strict TDD workflow using [`spec-kit`](https://github.com/github/spec-kit). See [spec-kit documentation](https://github.com/github/spec-kit).
 
 ## 6.3 Code Quality & Automation
 
@@ -23,9 +23,10 @@ globs: tests/**/*.py, src/**/*.py, *.md, *.toml, *.yaml, *.json
   * `task test:unit` runs the full pytest suite.
   * `task ci:check` chains linting and unit tests for CI validation.
   * `task ci:benchmarks` runs the benchmark suite when performance validation is required.
+* **Self-Validation:** Contributors MUST execute the relevant Taskfile targets locally (tests, benchmarks, or linting) before delivering checkpoints or status summaries.
 
 ## 6.4 Performance & Benchmarking
 
 * **Mandate:** A performance-first mindset must be maintained.
 * **Strategy:** The project's performance strategy is defined in ADR-0005.
-* **Requirement:** Performance-sensitive systems (e.g., pathfinding, ECS processing) MUST be benchmarked using `pytest-benchmark`.
+* **Requirement:** Performance-sensitive systems (e.g., pathfinding, ECS processing) MUST be benchmarked using `pytest-codspeed`.
