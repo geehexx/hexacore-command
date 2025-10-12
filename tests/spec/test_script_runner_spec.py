@@ -1,10 +1,9 @@
 """Hexa-Script runner specifications."""
 
-# ruff: noqa: S101
 from __future__ import annotations
 
+# ruff: noqa: S101
 import pytest
-
 from hexa_core.engine.script_runner import ScriptRunner
 
 

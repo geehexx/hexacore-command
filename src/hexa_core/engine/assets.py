@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Mapping
+from typing import Self
 
 
 @dataclass(slots=True)
@@ -15,7 +16,7 @@ class AssetManifest:
     entries: dict[str, dict[str, Path]]
 
     @classmethod
-    def from_file(cls, path: Path | str) -> "AssetManifest":
+    def from_file(cls: type[AssetManifest], path: Path | str) -> AssetManifest:
         manifest_path = Path(path)
         data = json.loads(manifest_path.read_text(encoding="utf-8"))
         return cls(cls._normalize_entries(data))
@@ -27,7 +28,7 @@ class AssetManifest:
             normalized[category] = {name: Path(location) for name, location in items.items()}
         return normalized
 
-    def get_asset_path(self, category: str, name: str) -> Path:
+    def get_asset_path(self: Self, category: str, name: str) -> Path:
         try:
             category_entries = self.entries[category]
         except KeyError as exc:  # pragma: no cover - defensive guard

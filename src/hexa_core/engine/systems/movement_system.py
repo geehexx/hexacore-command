@@ -11,6 +11,7 @@ from hexa_core.engine.components import MovementIntentComponent, PositionCompone
 from hexa_core.engine.datatypes import HexCoord
 from hexa_core.engine.event_bus import EventBus
 
+
 class MovementSystem(esper.Processor):
     """Resolves movement intents and publishes completion events."""
 

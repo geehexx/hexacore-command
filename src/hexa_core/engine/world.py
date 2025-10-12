@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from itertools import count
-from typing import ParamSpec, Self, TypeVar
+from typing import ParamSpec, Self, TypeVar, cast
 
 import esper
 
@@ -96,7 +96,7 @@ class GameWorld:
         from hexa_core.engine.systems.turn_system import TurnManager
 
         with self._activate_context():
-            manager = esper.get_processor(TurnManager)
+            manager = cast(TurnManager | None, esper.get_processor(TurnManager))
             if manager is None:  # pragma: no cover - defensive guard
                 msg = "TurnManager processor is not registered"
                 raise RuntimeError(msg)

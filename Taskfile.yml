@@ -40,6 +40,11 @@ tasks:
     cmds:
       - "{{.UV}} run pytest --codspeed -n auto tests/benchmarks/"
 
+  coverage:report:
+    desc: Generate a coverage report with enforced thresholds.
+    cmds:
+      - "{{.UV}} run pytest --cov=src/hexa_core --cov-report=term-missing"
+
   test:property:
     desc: Execute property-based tests.
     cmds:
@@ -66,6 +71,11 @@ tasks:
       - lint:ruff
       - lint:mypy
       - lint:markdown
+
+  security:audit:
+    desc: Audit project dependencies for known vulnerabilities.
+    cmds:
+      - "{{.UV}} run pip-audit --ignore-vuln GHSA-4xh5-x5gv-qwph"
 
   ci:pre-commit:
     desc: Run all pre-commit hooks across the repository.

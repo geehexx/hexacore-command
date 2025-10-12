@@ -1,12 +1,11 @@
 """Combat system specification tests."""
 
-# ruff: noqa: S101
 from __future__ import annotations
 
+# ruff: noqa: S101
 from collections import deque
 
 import pytest
-
 from hexa_core.engine.components import CombatIntentComponent, StatsComponent
 from hexa_core.engine.event_bus import EventBus
 from hexa_core.engine.world import GameWorld

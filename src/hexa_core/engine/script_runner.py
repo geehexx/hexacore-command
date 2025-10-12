@@ -2,17 +2,85 @@
 
 from __future__ import annotations
 
+import re
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
-from typing import Any, Callable, Self
+from typing import Final, Self, TypeAlias, cast
 
-Token = tuple[str, list[str]]
-Instruction = tuple[str, tuple[Any, ...]]
+VariableValue: TypeAlias = int | str
 
 
-@dataclass
-class ScriptProgram:
-    instructions: list[Instruction]
-    labels: dict[str, int]
+@dataclass(frozen=True)
+class VariableRef:
+    """Reference to a variable stored in the execution context."""
+
+    name: str
+
+
+@dataclass(frozen=True)
+class BinaryExpression:
+    """Binary arithmetic expression."""
+
+    left: Expression
+    operator: str
+    right: Expression
+
+
+Expression: TypeAlias = VariableValue | VariableRef | BinaryExpression
+
+
+@dataclass(frozen=True)
+class SetInstruction:
+    name: str
+    expression: Expression
+
+
+@dataclass(frozen=True)
+class ActionInstruction:
+    name: str
+    arguments: tuple[Expression, ...]
+
+
+@dataclass(frozen=True)
+class GotoInstruction:
+    label: str
+
+
+@dataclass(frozen=True)
+class IfGotoInstruction:
+    left: Expression
+    operator: str
+    right: Expression
+    label: str
+
+
+@dataclass(frozen=True)
+class IfThenInstruction:
+    left: Expression
+    operator: str
+    right: Expression
+    inline_instruction: InlineInstruction
+
+
+@dataclass(frozen=True)
+class EndInstruction:
+    pass
+
+
+InlineInstruction: TypeAlias = SetInstruction | ActionInstruction | GotoInstruction
+Instruction: TypeAlias = InlineInstruction | IfGotoInstruction | IfThenInstruction | EndInstruction
+Token: TypeAlias = tuple[str, tuple[str, ...]]
+ActionRecord: TypeAlias = tuple[str, tuple[VariableValue, ...]]
+
+_OPERATOR_FUNCTIONS: Final[dict[str, Callable[[int, int], int]]] = {
+    "+": lambda a, b: a + b,
+    "-": lambda a, b: a - b,
+    "*": lambda a, b: a * b,
+    "/": lambda a, b: a // b,
+}
+
+_EQUALITY_OPERATORS: Final[set[str]] = {"==", "!="}
+_COMPARISON_OPERATORS: Final[set[str]] = {"<", "<=", ">", ">="}
 
 
 class ScriptParseError(ValueError):
@@ -21,6 +89,21 @@ class ScriptParseError(ValueError):
 
 class ScriptRuntimeError(RuntimeError):
     """Raised when Hexa-Script execution fails."""
+
+
+@dataclass
+class ScriptProgram:
+    instructions: list[Instruction]
+    labels: dict[str, int]
+
+
+@dataclass
+class ExecutionContext:
+    variables: dict[str, VariableValue]
+    actions: list[ActionRecord]
+
+
+TOKEN_PATTERN: Final[re.Pattern[str]] = re.compile(r'"[^"]*"|\(|\)|\S+')
 
 
 class ScriptRunner:
@@ -35,232 +118,284 @@ class ScriptRunner:
         tokens = self._tokenize(source)
         self._program = self._compile(tokens)
 
-    def execute(self: Self, context: dict[str, Any]) -> None:
+    def execute(self: Self, context: dict[str, object]) -> None:
         """Execute the loaded program against the provided context."""
 
         if self._program is None:
             raise ScriptRuntimeError("No script loaded")
 
-        variables = context.setdefault("variables", {})
-        actions = context.setdefault("actions", [])
-        if not isinstance(variables, dict):
-            raise ScriptRuntimeError("Context 'variables' must be a dictionary")
-        if not isinstance(actions, list):
-            raise ScriptRuntimeError("Context 'actions' must be a list")
-
-        pc = 0
-        program = self._program.instructions
+        exec_context = self._normalize_context(context)
+        instructions = self._program.instructions
         labels = self._program.labels
 
-        while pc < len(program):
-            opcode, operands = program[pc]
-            if opcode == "SET":
-                name, expr = operands
-                variables[name] = self._evaluate(expr, variables)
-                pc += 1
-            elif opcode == "GOTO":
-                label = operands[0]
-                if label not in labels:
-                    msg = f"Label '{label}' not defined"
-                    raise ScriptRuntimeError(msg)
-                pc = labels[label]
-            elif opcode == "IF_GOTO":
-                left, op, right, label = operands
-                if self._evaluate_condition(left, op, right, variables):
-                    if label not in labels:
-                        msg = f"Label '{label}' not defined"
-                        raise ScriptRuntimeError(msg)
-                    pc = labels[label]
-                else:
+        pc = 0
+        while pc < len(instructions):
+            instruction = instructions[pc]
+            match instruction:
+                case SetInstruction(name=name, expression=expression):
+                    exec_context.variables[name] = self._evaluate(expression, exec_context.variables)
                     pc += 1
-            elif opcode == "IF_THEN":
-                left, op, right, next_instruction = operands
-                if self._evaluate_condition(left, op, right, variables):
-                    opcode, more_operands = next_instruction
-                    if opcode == "SET":
-                        name, expr = more_operands
-                        variables[name] = self._evaluate(expr, variables)
-                        pc += 1
-                    elif opcode == "ACTION":
-                        action_name, args = more_operands
-                        actions.append((action_name, tuple(self._evaluate(arg, variables) for arg in args)))
-                        pc += 1
-                    elif opcode == "GOTO":
-                        label = more_operands[0]
-                        if label not in labels:
-                            msg = f"Label '{label}' not defined"
-                            raise ScriptRuntimeError(msg)
-                        pc = labels[label]
+                case GotoInstruction(label=label):
+                    pc = self._jump_to(label, labels)
+                case IfGotoInstruction(left=left, operator=op, right=right, label=label):
+                    if self._evaluate_condition(left, op, right, exec_context.variables):
+                        pc = self._jump_to(label, labels)
                     else:
-                        msg = f"Unsupported inline THEN command '{opcode}'"
-                        raise ScriptRuntimeError(msg)
-                else:
+                        pc += 1
+                case IfThenInstruction(left=left, operator=op, right=right, inline_instruction=inline_instr):
+                    if self._evaluate_condition(left, op, right, exec_context.variables):
+                        pc = self._execute_inline(inline_instr, pc, exec_context, labels)
+                    else:
+                        pc += 1
+                case ActionInstruction(name=name, arguments=arguments):
+                    result = tuple(self._evaluate(arg, exec_context.variables) for arg in arguments)
+                    exec_context.actions.append((name, result))
                     pc += 1
-            elif opcode == "ACTION":
-                name, args = operands
-                actions.append((name, tuple(self._evaluate(arg, variables) for arg in args)))
-                pc += 1
-            elif opcode == "END":
-                break
-            else:  # pragma: no cover - defensive guard
-                msg = f"Unknown opcode '{opcode}'"
-                raise ScriptRuntimeError(msg)
+                case EndInstruction():
+                    break
+                case _:
+                    msg = f"Unknown instruction '{instruction}'"
+                    raise ScriptRuntimeError(msg)
 
-    # -- Compilation helpers -------------------------------------------------
+    # -- Context helpers -------------------------------------------------
+
+    def _normalize_context(self: Self, context: dict[str, object]) -> ExecutionContext:
+        variables_obj = context.setdefault("variables", {})
+        if not isinstance(variables_obj, dict):
+            raise ScriptRuntimeError("Context 'variables' must be a dictionary")
+        for key, value in variables_obj.items():
+            if not isinstance(key, str):
+                raise ScriptRuntimeError("Variable names must be strings")
+            if not isinstance(value, int | str):
+                raise ScriptRuntimeError("Variable values must be ints or strings")
+
+        actions_obj = context.setdefault("actions", [])
+        if not isinstance(actions_obj, list):
+            raise ScriptRuntimeError("Context 'actions' must be a list")
+        for action in actions_obj:
+            if not (
+                isinstance(action, tuple)
+                and len(action) == 2
+                and isinstance(action[0], str)
+                and isinstance(action[1], tuple)
+                and all(isinstance(arg, int | str) for arg in action[1])
+            ):
+                raise ScriptRuntimeError("Recorded actions must be tuples of name and argument tuple")
+
+        return ExecutionContext(
+            variables=cast(dict[str, VariableValue], variables_obj),
+            actions=cast(list[ActionRecord], actions_obj),
+        )
+
+    def _execute_inline(
+        self: Self,
+        instruction: InlineInstruction,
+        pc: int,
+        context: ExecutionContext,
+        labels: dict[str, int],
+    ) -> int:
+        match instruction:
+            case SetInstruction(name=name, expression=expression):
+                context.variables[name] = self._evaluate(expression, context.variables)
+                return pc + 1
+            case ActionInstruction(name=name, arguments=arguments):
+                result = tuple(self._evaluate(arg, context.variables) for arg in arguments)
+                context.actions.append((name, result))
+                return pc + 1
+            case GotoInstruction(label=label):
+                return self._jump_to(label, labels)
+        msg = f"Unsupported inline instruction '{instruction}'"
+        raise ScriptRuntimeError(msg)
+
+    def _jump_to(self: Self, label: str, labels: dict[str, int]) -> int:
+        try:
+            return labels[label]
+        except KeyError as exc:
+            raise ScriptRuntimeError(f"Label '{label}' not defined") from exc
+
+    # -- Evaluation helpers -------------------------------------------------
+
+    def _evaluate(self: Self, value: Expression, variables: dict[str, VariableValue]) -> VariableValue:
+        if isinstance(value, VariableRef):
+            return variables.get(value.name, 0)
+        if isinstance(value, BinaryExpression):
+            left_value = self._require_int(self._evaluate(value.left, variables))
+            right_value = self._require_int(self._evaluate(value.right, variables))
+            operator = value.operator
+            if operator not in _OPERATOR_FUNCTIONS:
+                msg = f"Unsupported operator '{operator}'"
+                raise ScriptRuntimeError(msg)
+            return _OPERATOR_FUNCTIONS[operator](left_value, right_value)
+        return value
+
+    def _evaluate_condition(
+        self: Self,
+        left: Expression,
+        operator: str,
+        right: Expression,
+        variables: dict[str, VariableValue],
+    ) -> bool:
+        left_value = self._evaluate(left, variables)
+        right_value = self._evaluate(right, variables)
+
+        if operator in _EQUALITY_OPERATORS:
+            if operator == "==":
+                return left_value == right_value
+            return left_value != right_value
+        if operator in _COMPARISON_OPERATORS:
+            left_int = self._require_int(left_value)
+            right_int = self._require_int(right_value)
+            if operator == "<":
+                return left_int < right_int
+            if operator == "<=":
+                return left_int <= right_int
+            if operator == ">":
+                return left_int > right_int
+            if operator == ">=":
+                return left_int >= right_int
+        msg = f"Unsupported comparison '{operator}'"
+        raise ScriptRuntimeError(msg)
+
+    def _require_int(self: Self, value: VariableValue) -> int:
+        if not isinstance(value, int):
+            msg = f"Expected integer value, received {value!r}"
+            raise ScriptRuntimeError(msg)
+        return value
+
+    # -- Tokenization -------------------------------------------------
 
     def _tokenize(self: Self, source: str) -> list[Token]:
         tokens: list[Token] = []
         for raw_line in source.splitlines():
-            line = raw_line.strip()
-            if not line or line.startswith("#"):
-                continue
-            current: list[str] = []
-            buffer = ""
-            in_quote = False
-            i = 0
-            while i < len(line):
-                char = line[i]
-                if char == '"':
-                    if in_quote:
-                        current.append(f'"{buffer}"')
-                        buffer = ""
-                    in_quote = not in_quote
-                    i += 1
-                    continue
-                if in_quote:
-                    buffer += char
-                    i += 1
-                    continue
-                if char.isspace():
-                    if buffer:
-                        current.append(buffer)
-                        buffer = ""
-                    i += 1
-                    continue
-                if char in "()":
-                    if buffer:
-                        current.append(buffer)
-                        buffer = ""
-                    current.append(char)
-                    i += 1
-                    continue
-                buffer += char
-                i += 1
-            if buffer:
-                current.append(buffer)
-            if not current:
-                continue
-            keyword = current[0].upper()
-            tokens.append((keyword, current[1:]))
+            token = self._tokenize_line(raw_line)
+            if token is not None:
+                tokens.append(token)
         return tokens
 
-    def _compile(self: Self, tokens: list[Token]) -> ScriptProgram:
+    def _tokenize_line(self: Self, raw_line: str) -> Token | None:
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            return None
+
+        parts = TOKEN_PATTERN.findall(line)
+        if not parts:
+            return None
+        keyword, *args = parts
+        return keyword.upper(), tuple(args)
+
+    # -- Compilation -------------------------------------------------
+
+    def _compile(self: Self, tokens: Iterable[Token]) -> ScriptProgram:
         instructions: list[Instruction] = []
         labels: dict[str, int] = {}
 
-        for keyword, args in tokens:
+        for keyword, arguments in tokens:
             if keyword == "LABEL":
-                label_name = self._expect_string(args, 0)
+                label_name = self._expect_string(arguments, 0)
                 labels[label_name] = len(instructions)
-            elif keyword == "SET":
-                name = self._expect_string(args, 0)
-                expression = self._parse_expression(args[1:])
-                instructions.append(("SET", (name, expression)))
-            elif keyword == "GOTO":
-                label_name = self._expect_string(args, 0)
-                instructions.append(("GOTO", (label_name,)))
-            elif keyword == "IF":
-                condition_tokens, remainder = self._split_condition(args)
-                left, op, right = self._parse_condition(condition_tokens)
-                if remainder and remainder[0].upper() == "THEN":
-                    inline_tokens = remainder[1:]
-                    if inline_tokens and inline_tokens[0].upper() == "GOTO":
-                        label_name = self._expect_string(inline_tokens, 1)
-                        instructions.append(("IF_GOTO", (left, op, right, label_name)))
-                    else:
-                        inline_instruction = self._parse_inline(inline_tokens)
-                        instructions.append(("IF_THEN", (left, op, right, inline_instruction)))
-                elif remainder and remainder[0].upper() == "GOTO":
-                    label_name = self._expect_string(remainder, 1)
-                    instructions.append(("IF_GOTO", (left, op, right, label_name)))
-                else:
-                    msg = "IF statement must be followed by THEN or GOTO"
-                    raise ScriptParseError(msg)
-            elif keyword == "ACTION":
-                name = self._expect_string(args, 0)
-                action_args = [self._parse_value(arg) for arg in args[1:]]
-                instructions.append(("ACTION", (name, tuple(action_args))))
-            elif keyword == "END":
-                instructions.append(("END", tuple()))
-            else:
-                msg = f"Unknown keyword '{keyword}'"
-                raise ScriptParseError(msg)
+                continue
+            instructions.extend(self._compile_token(keyword, arguments, labels))
 
-        instructions.append(("END", tuple()))
+        if not instructions or not isinstance(instructions[-1], EndInstruction):
+            instructions.append(EndInstruction())
         return ScriptProgram(instructions=instructions, labels=labels)
 
-    def _parse_expression(self: Self, tokens: list[str]) -> Any:
+    def _compile_token(
+        self: Self,
+        keyword: str,
+        arguments: Sequence[str],
+        labels: dict[str, int],
+    ) -> list[Instruction]:
+        if keyword == "SET":
+            name = self._expect_string(arguments, 0)
+            expression = self._parse_expression(arguments[1:])
+            return [SetInstruction(name=name, expression=expression)]
+        if keyword == "GOTO":
+            label_name = self._expect_string(arguments, 0)
+            return [GotoInstruction(label=label_name)]
+        if keyword == "IF":
+            condition_tokens, remainder = self._split_condition(arguments)
+            left, operator, right = self._parse_condition(condition_tokens)
+            if remainder and remainder[0].upper() == "THEN":
+                inline_tokens = remainder[1:]
+                if inline_tokens and inline_tokens[0].upper() == "GOTO":
+                    label_name = self._expect_string(inline_tokens, 1)
+                    return [IfGotoInstruction(left=left, operator=operator, right=right, label=label_name)]
+                inline_instruction = self._parse_inline(inline_tokens)
+                return [
+                    IfThenInstruction(
+                        left=left,
+                        operator=operator,
+                        right=right,
+                        inline_instruction=inline_instruction,
+                    )
+                ]
+            if remainder and remainder[0].upper() == "GOTO":
+                label_name = self._expect_string(remainder, 1)
+                return [IfGotoInstruction(left=left, operator=operator, right=right, label=label_name)]
+            raise ScriptParseError("IF statement must be followed by THEN or GOTO")
+        if keyword == "ACTION":
+            name = self._expect_string(arguments, 0)
+            action_args = tuple(self._parse_value(arg) for arg in arguments[1:])
+            return [ActionInstruction(name=name, arguments=action_args)]
+        if keyword == "END":
+            return [EndInstruction()]
+        raise ScriptParseError(f"Unknown keyword '{keyword}'")
+
+    def _parse_expression(self: Self, tokens: Sequence[str]) -> Expression:
         if not tokens:
-            msg = "Expression expected"
-            raise ScriptParseError(msg)
+            raise ScriptParseError("Expression expected")
         if tokens[0] == "(":
             if tokens[-1] != ")" or len(tokens) < 4:
-                msg = "Malformed expression"
-                raise ScriptParseError(msg)
+                raise ScriptParseError("Malformed expression")
             left = self._parse_value(tokens[1])
-            op = tokens[2]
+            operator = tokens[2]
             right = self._parse_value(tokens[3])
-            return ("EXPR", left, op, right)
+            return BinaryExpression(left=left, operator=operator, right=right)
         if len(tokens) != 1:
-            msg = "Unexpected tokens in expression"
-            raise ScriptParseError(msg)
+            raise ScriptParseError("Unexpected tokens in expression")
         return self._parse_value(tokens[0])
 
-    def _parse_value(self: Self, token: str) -> Any:
+    def _parse_value(self: Self, token: str) -> Expression:
         stripped = self._strip_quotes(token)
         if stripped is not None:
             return stripped
-        if token.isdigit():
-            return int(token)
         if token.replace("-", "", 1).isdigit():
             return int(token)
-        return ("VAR", token)
+        return VariableRef(name=token)
 
-    def _split_condition(self: Self, tokens: list[str]) -> tuple[list[str], list[str]]:
+    def _split_condition(self: Self, tokens: Sequence[str]) -> tuple[list[str], list[str]]:
         for index, token in enumerate(tokens):
             if token.upper() in {"THEN", "GOTO"}:
-                return tokens[:index], tokens[index:]
-        return tokens, []
+                return list(tokens[:index]), list(tokens[index:])
+        return list(tokens), []
 
-    def _parse_condition(self: Self, tokens: list[str]) -> tuple[Any, str, Any]:
+    def _parse_condition(self: Self, tokens: Sequence[str]) -> tuple[Expression, str, Expression]:
         if len(tokens) < 3:
-            msg = "Incomplete condition"
-            raise ScriptParseError(msg)
+            raise ScriptParseError("Incomplete condition")
         left = self._parse_value(tokens[0])
-        op = tokens[1]
+        operator = tokens[1]
         right = self._parse_value(tokens[2])
-        return left, op, right
+        return left, operator, right
 
-    def _parse_inline(self: Self, tokens: list[str]) -> Instruction:
+    def _parse_inline(self: Self, tokens: Sequence[str]) -> InlineInstruction:
         if not tokens:
-            msg = "Inline command missing"
-            raise ScriptParseError(msg)
+            raise ScriptParseError("Inline command missing")
         keyword = tokens[0].upper()
         if keyword == "SET":
             name = self._expect_string(tokens, 1)
             expression = self._parse_expression(tokens[2:])
-            return ("SET", (name, expression))
+            return SetInstruction(name=name, expression=expression)
         if keyword == "ACTION":
             name = self._expect_string(tokens, 1)
-            args = [self._parse_value(token) for token in tokens[2:]]
-            return ("ACTION", (name, tuple(args)))
+            args = tuple(self._parse_value(token) for token in tokens[2:])
+            return ActionInstruction(name=name, arguments=args)
         if keyword == "GOTO":
             label_name = self._expect_string(tokens, 1)
-            return ("GOTO", (label_name,))
-        msg = f"Unsupported inline THEN command '{keyword}'"
-        raise ScriptParseError(msg)
+            return GotoInstruction(label=label_name)
+        raise ScriptParseError(f"Unsupported inline THEN command '{keyword}'")
 
-    def _expect_string(self: Self, tokens: list[str], index: int) -> str:
+    def _expect_string(self: Self, tokens: Sequence[str], index: int) -> str:
         try:
             value = tokens[index]
         except IndexError as exc:  # pragma: no cover - defensive guard
@@ -272,49 +407,3 @@ class ScriptRunner:
         if len(token) >= 2 and token[0] == '"' and token[-1] == '"':
             return token[1:-1]
         return None
-
-    # -- Evaluation helpers --------------------------------------------------
-
-    def _evaluate(self: Self, value: Any, variables: dict[str, Any]) -> Any:
-        if isinstance(value, tuple) and value:
-            tag = value[0]
-            if tag == "VAR":
-                name = value[1]
-                return variables.get(name, 0)
-            if tag == "EXPR":
-                _, left, op, right = value
-                left_value = self._evaluate(left, variables)
-                right_value = self._evaluate(right, variables)
-                return self._apply_operator(op, left_value, right_value)
-        return value
-
-    def _evaluate_condition(self: Self, left: Any, op: str, right: Any, variables: dict[str, Any]) -> bool:
-        left_value = self._evaluate(left, variables)
-        right_value = self._evaluate(right, variables)
-        return self._apply_comparison(op, left_value, right_value)
-
-    def _apply_operator(self: Self, op: str, left: Any, right: Any) -> Any:
-        operators: dict[str, Callable[[Any, Any], Any]] = {
-            "+": lambda a, b: a + b,
-            "-": lambda a, b: a - b,
-            "*": lambda a, b: a * b,
-            "/": lambda a, b: a // b,
-        }
-        if op not in operators:
-            msg = f"Unsupported operator '{op}'"
-            raise ScriptRuntimeError(msg)
-        return operators[op](left, right)
-
-    def _apply_comparison(self: Self, op: str, left: Any, right: Any) -> bool:
-        comparisons: dict[str, Callable[[Any, Any], bool]] = {
-            "==": lambda a, b: a == b,
-            "!=": lambda a, b: a != b,
-            ">": lambda a, b: a > b,
-            "<": lambda a, b: a < b,
-            ">=": lambda a, b: a >= b,
-            "<=": lambda a, b: a <= b,
-        }
-        if op not in comparisons:
-            msg = f"Unsupported comparison '{op}'"
-            raise ScriptRuntimeError(msg)
-        return comparisons[op](left, right)

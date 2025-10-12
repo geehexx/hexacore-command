@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Self
 
 
 @dataclass(slots=True)
@@ -31,7 +32,7 @@ class LevelData:
 class MapLoader:
     """Load map definitions from JSON files."""
 
-    def load(self, path: Path | str) -> LevelData:
+    def load(self: Self, path: Path | str) -> LevelData:
         map_path = Path(path)
         if not map_path.exists():
             raise FileNotFoundError(f"Map file not found: {map_path}")
@@ -44,10 +45,10 @@ class MapLoader:
             entities=self._parse_entities(data.get("entities", [])),
         )
 
-    def _parse_grid(self, grid: dict[str, int]) -> LevelGridSize:
+    def _parse_grid(self: Self, grid: dict[str, int]) -> LevelGridSize:
         return LevelGridSize(width=grid["width"], height=grid["height"])
 
-    def _parse_tiles(self, tiles: Iterable[dict[str, Any]]) -> list[tuple[str, int, int]]:
+    def _parse_tiles(self: Self, tiles: Iterable[dict[str, Any]]) -> list[tuple[str, int, int]]:
         return [
             (
                 tile["type"],
@@ -57,7 +58,7 @@ class MapLoader:
             for tile in tiles
         ]
 
-    def _parse_entities(self, entities: Iterable[dict[str, Any]]) -> list[LevelEntity]:
+    def _parse_entities(self: Self, entities: Iterable[dict[str, Any]]) -> list[LevelEntity]:
         parsed: list[LevelEntity] = []
         for entity in entities:
             name = entity["name"]

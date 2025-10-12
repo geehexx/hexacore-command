@@ -8,9 +8,9 @@ auto_execution_mode: 3
 ## State Check & Alignment
 
 Before proceeding, perform an internal state check:
-    1.  **Recall the Original Objective:** Re-read the initial prompt to re-anchor to the primary goal.
-    2.  **Review the Last Action:** Analyze your most recent output to understand the current state.
-    3.  **Identify the Immediate Goal:** Based on the above, determine the single most logical next step required to advance the plan.
+    1. **Recall the Original Objective:** Re-read the initial prompt to re-anchor to the primary goal.
+    2. **Review the Last Action:** Analyze your most recent output to understand the current state.
+    3. **Identify the Immediate Goal:** Based on the above, determine the single most logical next step required to advance the plan.
 
 ## Guiding Rules
 

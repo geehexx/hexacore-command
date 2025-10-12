@@ -1,10 +1,9 @@
 """Turn manager specification tests."""
 
-# ruff: noqa: S101
 from __future__ import annotations
 
+# ruff: noqa: S101
 import pytest
-
 from hexa_core.engine.components import StatsComponent, TurnComponent
 from hexa_core.engine.world import GameWorld
 

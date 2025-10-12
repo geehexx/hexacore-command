@@ -5,6 +5,8 @@ auto_execution_mode: 3
 
 # Git Commit Workflow
 
+> Prefer running `/develop-feature` for end-to-end feature delivery. Use this commit workflow at the finalization steps or for maintenance work that falls outside `/develop-feature`.
+
 1. Run `mcp2_git_status` for the repo to capture the baseline working tree.
 2. Perform the required edits, validations, and automated tests, consulting `docs/tooling/editing-tools.md` to choose the correct editor and to create missing directories if necessary.
 3. Re-run `mcp2_git_status` to surface new changes and confirm no unexpected files.

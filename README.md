@@ -17,6 +17,12 @@ This project is designed to be developed within a VS Code Dev Container.
 
 If you prefer running locally, install Python 3.11+, [uv](https://docs.astral.sh/uv/), and execute `uv pip install .[dev]` to reproduce the development environment.
 
+## Development Workflow
+
+Run `/develop-feature` inside Windsurf for any end-to-end feature effort. The workflow enforces planning, implementation, validation, and finalization steps aligned with `.windsurf/rules/`.
+
+Architectural changes must go through `/propose-new-adr` before editing constitutional documents. For documentation-only updates, `/update-living-documentation` remains available.
+
 ## Task Automation
 
 This project standardizes developer workflows with [Task](https://taskfile.dev/). List all available targets via `task --list` or run the high-value tasks below:
@@ -25,7 +31,9 @@ This project standardizes developer workflows with [Task](https://taskfile.dev/)
 - `task test:unit` executes the full `pytest` suite.
 - `task test:spec` focuses on the `spec-kit` driven scenarios in `tests/spec/`.
 - `task test:benchmarks` runs the CodSpeed-backed performance suite (`pytest --codspeed`).
+- `task coverage:report` enforces the ≥85 % coverage threshold with `pytest --cov`.
 - `task lint:all` runs Ruff, MyPy, and PyMarkdown in sequence.
+- `task security:audit` runs `pip-audit` against project dependencies.
 - `task ci:check` chains `task lint:all` and `task test:unit` to mirror CI expectations.
 - `task ci:benchmarks` executes the benchmark-only validation path.
 

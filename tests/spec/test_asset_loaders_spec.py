@@ -1,13 +1,11 @@
 """Asset loader specification tests."""
 
-# ruff: noqa: S101
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
 import pytest
-
 from hexa_core.engine.assets import AssetManifest
 from hexa_core.engine.maps import MapLoader
 

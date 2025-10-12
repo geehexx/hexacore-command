@@ -21,7 +21,9 @@ dev = [
   "pytest-codspeed==2.2.1",
   "pytest-xdist==3.5.0",
   "hypothesis==6.99.0",
-  "types-Pygments"
+  "types-Pygments",
+  "pytest-cov==4.1.0",
+  "pip-audit==2.7.2"
 ]
 
 [tool.pytest.ini_options]
@@ -33,6 +35,9 @@ line-length = 250
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "C", "B", "UP", "ANN", "SIM", "S", "T20"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/spec/*" = ["S101"]
 
 [tool.mypy]
 python_version = "3.11"
