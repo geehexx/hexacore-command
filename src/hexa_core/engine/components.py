@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from hexa_core.engine.datatypes import HexCoord
+
 
 @dataclass(slots=True)
 class PositionComponent:
@@ -35,3 +37,18 @@ class TurnComponent:
 
     turn_counter: int = 0
     ready: bool = False
+
+
+@dataclass(slots=True)
+class MovementIntentComponent:
+    """Target coordinate for pending movement resolution."""
+
+    target: HexCoord
+
+
+@dataclass(slots=True)
+class CombatIntentComponent:
+    """Pending combat action against a specified target."""
+
+    target: int
+    damage: int

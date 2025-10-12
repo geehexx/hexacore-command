@@ -3,30 +3,42 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Self, cast
+from typing import Self, cast
 
 import esper
 
-from hexa_core.engine.components import PositionComponent
-
-if TYPE_CHECKING:
-    from esper import World as EsperWorld  # type: ignore[attr-defined]
-else:
-    EsperWorld = esper.World
-
+from hexa_core.engine.components import MovementIntentComponent, PositionComponent
+from hexa_core.engine.datatypes import HexCoord
+from hexa_core.engine.event_bus import EventBus
 
 class MovementSystem(esper.Processor):
-    """Placeholder movement system."""
+    """Resolves movement intents and publishes completion events."""
 
-    world: EsperWorld  # Provided by esper.Processor
+    def __init__(self: Self, event_bus: EventBus) -> None:
+        super().__init__()
+        self._event_bus = event_bus
 
-    def process(self: Self, *_: object, **__: object) -> None:  # pragma: no cover - placeholder
-        """Process movement for entities with a path to follow."""
-        for _entity, _position in self._iter_positions():
-            # TODO: Implement pathfinding and movement resolution.
-            continue
+    def process(self: Self, *_: object, **__: object) -> None:
+        for entity, (position, intent) in self._iter_intents():
+            origin = HexCoord(position.q, position.r)
+            destination = intent.target
 
-    def _iter_positions(self: Self) -> Iterable[tuple[int, PositionComponent]]:
-        """Iterate over entities with `PositionComponent`."""
-        components = self.world.get_components(PositionComponent)
-        return cast(Iterable[tuple[int, PositionComponent]], components)
+            position.q = destination.q
+            position.r = destination.r
+            esper.remove_component(entity, MovementIntentComponent)
+
+            self._event_bus.publish(
+                "engine.movement.completed",
+                {
+                    "entity_id": entity,
+                    "from": origin,
+                    "to": destination,
+                },
+            )
+
+    def _iter_intents(self: Self) -> Iterable[tuple[int, tuple[PositionComponent, MovementIntentComponent]]]:
+        components = esper.get_components(PositionComponent, MovementIntentComponent)
+        return cast(
+            Iterable[tuple[int, tuple[PositionComponent, MovementIntentComponent]]],
+            components,
+        )

@@ -2,25 +2,35 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
-
 import esper
 
-from hexa_core.engine.components import StatsComponent
-
-if TYPE_CHECKING:
-    from esper import World as EsperWorld  # type: ignore[attr-defined]
-else:
-    EsperWorld = esper.World
+from hexa_core.engine.components import CombatIntentComponent, StatsComponent
+from hexa_core.engine.event_bus import EventBus
 
 
 class CombatSystem(esper.Processor):
-    """Placeholder combat system."""
+    """Processes combat intents and applies damage."""
 
-    world: EsperWorld  # Provided by esper.Processor
+    def __init__(self, event_bus: EventBus) -> None:
+        super().__init__()
+        self._event_bus = event_bus
 
-    def process(self: Self, *_: object, **__: object) -> None:  # pragma: no cover - placeholder
-        """Apply combat interactions between entities."""
-        for _entity, _stats in self.world.get_component(StatsComponent):
-            # TODO: Implement combat resolution logic.
-            continue
+    def process(self, *_: object, **__: object) -> None:
+        for entity, (stats, intent) in list(esper.get_components(StatsComponent, CombatIntentComponent)):
+            target_stats = esper.component_for_entity(intent.target, StatsComponent)
+
+            target_stats.health = max(0, target_stats.health - intent.damage)
+            defeated = target_stats.health == 0
+
+            esper.remove_component(entity, CombatIntentComponent)
+
+            self._event_bus.publish(
+                "engine.combat.resolved",
+                {
+                    "attacker_id": entity,
+                    "target_id": intent.target,
+                    "damage": intent.damage,
+                    "remaining_health": target_stats.health,
+                    "defeated": defeated,
+                },
+            )
