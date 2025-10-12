@@ -44,3 +44,15 @@ globs: tests/**/*.py, src/**/*.py, *.md, *.toml, *.yaml, *.json
 * **Create When Missing:** If a file or directory is absent, create it explicitly with the appropriate tool (e.g., `mcp1_write_file`, `mcp1_create_directory`) before diffing.
 * **Diff Discipline:** Limit `apply_patch` to verified paths and avoid replacing entire files when scoped edits suffice.
 * **Post-Edit Validation:** Immediately rerun the relevant lint or test command after modifications to ensure no regressions were introduced.
+
+## 6.7 Git Operations via MCP
+
+* **Primary Interfaces:** All status, diff, staging, and commit actions MUST be executed through MCP Git tools (`mcp2_git_status`, `mcp2_git_diff_unstaged`, `mcp2_git_diff_staged`, `mcp2_git_add`, `mcp2_git_commit`). Direct CLI commands are reserved for exceptional cases when the MCP interface is unavailable, and the reason MUST be documented.
+* **Status Discipline:** Run `mcp2_git_status` before and after significant edits to maintain awareness of the working tree and to capture checkpoints for status summaries.
+* **Diff Review:** Inspect changes with `mcp2_git_diff_unstaged` and `mcp2_git_diff_staged`, adjusting context as needed to understand every modification.
+
+## 6.8 Ownership Verification & Generated Artifacts
+
+* **Ownership Check:** Before staging, confirm via MCP diffs that every change was introduced by the current task. If unrelated work is detected, resolve it (split commits, revert, or document blockers) before proceeding.
+* **Generated Outputs:** When deleting or cleaning generated artifacts (e.g., `.hypothesis/`), add the path to `.gitignore` or document why it must remain tracked. Avoid removing files you cannot confidently recreate.
+* **Commit Readiness:** Only stage files once ownership and ignore rules are validated, then confirm the staged snapshot with `mcp2_git_diff_staged` prior to committing.

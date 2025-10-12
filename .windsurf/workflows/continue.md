@@ -16,6 +16,6 @@ Before proceeding, perform an internal state check:
 
 All actions must strictly adhere to the rules in `.windsurf/rules`.
 
-## Execute Next Step
+## Execute Next Steps
 
-With your internal alignment complete, directly perform the single most logical next action to advance the plan. Do not describe the step; just do it. Ensure your action is efficient, correct, and directly addresses the immediate goal. Proceed.
+With your internal alignment complete, execute the sequence of logical next actions needed to advance toward the next checkpoint. Continue performing steps until you reach a natural stopping point (e.g., awaiting tests, needing clarification, workflow boundary). Provide brief progress updates when appropriate.

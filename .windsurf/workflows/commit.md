@@ -5,10 +5,12 @@ auto_execution_mode: 3
 
 # Git Commit Workflow
 
-1. Run `functions.*_git_status` with the repo path to capture the baseline working tree state before alterations.
+1. Run `mcp2_git_status` for the repo to capture the baseline working tree.
 2. Perform the required edits, validations, and automated tests.
-3. Inspect unstaged modifications via `functions.*_git_diff_unstaged` using the same repo path and adjust context lines as needed.
-4. Stage the intended changes through `functions.*_git_add`, supplying the repo path and explicit file list.
-5. Confirm the staged snapshot with `functions.*_git_diff_staged` to ensure only desired updates are staged.
-6. Commit the staged work with `functions.*_git_commit`, providing the repo path and a descriptive message.
-7. Optionally review recent history with `functions.*_git_log` when preparing checkpoints or summaries.
+3. Re-run `mcp2_git_status` to surface new changes and confirm no unexpected files.
+4. Inspect unstaged modifications via `mcp2_git_diff_unstaged`, adjusting context as needed to understand every edit.
+5. Verify ownership: ensure each diff belongs to the current task. If unrelated work is present, resolve before continuing.
+6. Stage the intended changes through `mcp2_git_add`, supplying the repo path and explicit file list.
+7. Confirm the staged snapshot with `mcp2_git_diff_staged` to ensure only desired updates are staged.
+8. Commit the staged work with `mcp2_git_commit`, providing the repo path and a descriptive message.
+9. Optionally review recent history with `mcp2_git_log` when preparing checkpoints or summaries.
