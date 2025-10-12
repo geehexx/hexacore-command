@@ -61,5 +61,7 @@
 * [ ] **Task 5:** Implement the basic layout of the Gameplay UI (Grid, Editor, Status panels).
 * [x] **Task 6:** Create `docs/renderer.md` as the living documentation for the UI and archive this initiative.
 
+> **Next Steps:** Gameplay UI delivery continues under `docs/initiatives/0006-arcade-renderer-integration.md`.
+
 ## 3. Final Confirmation
 After creating the files, confirm that the plan has been executed successfully.
