@@ -31,6 +31,10 @@ This project standardizes developer workflows with [Task](https://taskfile.dev/)
 
 These targets wrap the canonical `uv` commands to ensure consistency across agents and contributors. If a new workflow emerges, prefer adding a Taskfile entry before documenting a raw command.
 
+Within VS Code, invoke `Terminal → Run Task… → pymarkdown: scan active file` to lint the current document.
+The task surfaces findings through the Problems panel and reads the same `.pymarkdown.json` configuration used in CI.
+This keeps IDE feedback aligned with automated checks.
+
 ## **Architectural Overview**
 
 This project follows a strict set of architectural principles, enforced by Windsurf rules. Key decisions are documented in `docs/decisions`.
