@@ -89,3 +89,15 @@ class GameWorld:
         """Publish an event via the underlying `EventBus`."""
 
         self.event_bus.publish(event_type, payload)
+
+    def consume_turn(self: Self, entity: int) -> None:
+        """Delegate turn consumption to the registered `TurnManager`."""
+
+        from hexa_core.engine.systems.turn_system import TurnManager
+
+        with self._activate_context():
+            manager = esper.get_processor(TurnManager)
+            if manager is None:  # pragma: no cover - defensive guard
+                msg = "TurnManager processor is not registered"
+                raise RuntimeError(msg)
+            manager.consume_turn(entity)
