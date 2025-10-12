@@ -57,8 +57,8 @@
 * [x] **Task 1:** Implement the `HexaRenderer` to display the Main Menu screen.
 * [x] **Task 2:** Implement the state transition to the Mission Briefing screen.
 * [x] **Task 3:** Implement data loading and display for the Mission Briefing screen.
-* [ ] **Task 4:** Implement the state transition to the Gameplay UI screen.
-* [ ] **Task 5:** Implement the basic layout of the Gameplay UI (Grid, Editor, Status panels).
+* [x] **Task 4:** Implement the state transition to the Gameplay UI screen.
+* [x] **Task 5:** Implement the basic layout of the Gameplay UI (Grid, Editor, Status panels).
 * [x] **Task 6:** Create `docs/renderer.md` as the living documentation for the UI and archive this initiative.
 
 > **Next Steps:** Gameplay UI delivery continues under `docs/initiatives/0006-arcade-renderer-integration.md`.

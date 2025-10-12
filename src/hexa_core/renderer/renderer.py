@@ -131,6 +131,48 @@ class MissionBriefingView:
         return sum(len(word) for word in words) + (len(words) - 1)
 
 
+@dataclass(frozen=True)
+class ControlButton:
+    label: str
+    action: str
+    enabled: bool = True
+
+
+@dataclass(frozen=True)
+class BotStatusEntry:
+    label: str
+    value: str
+
+
+@dataclass(frozen=True)
+class BotStatusPanel:
+    heading: str
+    entries: tuple[BotStatusEntry, ...]
+
+
+@dataclass(frozen=True)
+class ScriptEditorView:
+    title: str
+    content: str
+    language: str
+    read_only: bool = False
+
+
+@dataclass(frozen=True)
+class GridPanelView:
+    title: str
+    dimensions: tuple[int, int]
+    preview: MapPreviewInfo | None = None
+
+
+@dataclass(frozen=True)
+class GameplayView:
+    grid_panel: GridPanelView
+    script_editor: ScriptEditorView
+    bot_status: BotStatusPanel
+    controls: tuple[ControlButton, ...]
+
+
 class HexaRenderer:
     """Placeholder renderer that will eventually integrate with Arcade."""
 
@@ -144,6 +186,7 @@ class HexaRenderer:
             "options": RendererState.MAIN_MENU,
         }
         self.mission_briefing: MissionBriefingView | None = None
+        self.gameplay_view: GameplayView | None = None
 
     def run(self: HexaRenderer) -> None:
         """Execute the render loop."""
@@ -221,6 +264,38 @@ class HexaRenderer:
         self.should_exit = False
 
     def proceed_to_gameplay(self: HexaRenderer) -> None:
+        if self.mission_briefing is None:
+            raise ValueError("Mission briefing not loaded")
+        self.gameplay_view = self.build_gameplay_view(self.mission_briefing)
         self.mission_briefing = None
         self.current_state = RendererState.GAMEPLAY
         self.should_exit = False
+
+    def build_gameplay_view(self: HexaRenderer, briefing: MissionBriefingView | None = None) -> GameplayView:
+        source = briefing or self.mission_briefing
+        title = "Simulation"
+        grid_size = (0, 0)
+        preview: MapPreviewInfo | None = None
+        if source is not None:
+            title = source.title
+            grid_size = source.grid_size
+            preview = source.map_preview
+        grid_panel = GridPanelView(title=title, dimensions=grid_size, preview=preview)
+        script_editor = ScriptEditorView(
+            title="Hexa-Script Editor",
+            content="",
+            language="hexascript",
+            read_only=False,
+        )
+        bot_status = BotStatusPanel(heading="Bot Status", entries=())
+        controls = (
+            ControlButton("Deploy Script", "deploy_script", True),
+            ControlButton("Pause Simulation", "pause_simulation", True),
+            ControlButton("Reset Level", "reset_level", True),
+        )
+        return GameplayView(
+            grid_panel=grid_panel,
+            script_editor=script_editor,
+            bot_status=bot_status,
+            controls=controls,
+        )
