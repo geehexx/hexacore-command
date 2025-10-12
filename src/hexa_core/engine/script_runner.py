@@ -2,20 +2,22 @@
 
 from __future__ import annotations
 
+from typing import Self
+
 
 class ScriptRunner:
     """Placeholder for the Hexa-Script execution engine."""
 
-    def __init__(self) -> None:
+    def __init__(self: Self) -> None:
         # TODO: Initialize lexer and parser built with SLY.
         self._program: str | None = None
 
-    def load(self, source: str) -> None:
+    def load(self: Self, source: str) -> None:
         """Load Hexa-Script source code."""
         # TODO: Parse the source into an executable form.
         self._program = source
 
-    def execute(self, context: dict[str, object]) -> None:  # pragma: no cover - stub
+    def execute(self: Self, context: dict[str, object]) -> None:  # pragma: no cover - stub
         """Execute the loaded program against the provided context."""
         if self._program is None:
             raise RuntimeError("No script loaded")

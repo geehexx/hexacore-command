@@ -58,7 +58,7 @@ tasks:
   lint:markdown:
     desc: Lint Markdown documentation with PyMarkdown.
     cmds:
-      - "{{.UV}} run pymarkdown scan ."
+      - "{{.UV}} run pymarkdown --config .pymarkdown.json scan ."
 
   lint:all:
     desc: Run all linting tasks (Ruff, MyPy, Markdown).

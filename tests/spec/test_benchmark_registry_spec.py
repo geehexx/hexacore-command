@@ -1,5 +1,9 @@
+"""Benchmark registry specification tests."""
+
+# ruff: noqa: S101
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 
 import pytest
@@ -13,16 +17,21 @@ class RecordedCall:
 
 
 class FakeBenchmarkRunner:
-    def __init__(self) -> None:
+    def __init__(self: FakeBenchmarkRunner) -> None:
         self.calls: list[RecordedCall] = []
 
-    def __call__(self, func, *args, **kwargs):
+    def __call__(
+        self: FakeBenchmarkRunner,
+        func: Callable[..., object],
+        *args: object,
+        **kwargs: object,
+    ) -> object:
         result = func(*args, **kwargs)
         self.calls.append(RecordedCall(func.__name__, result))
         return result
 
 
-def describe_benchmark_registry_registration():
+def describe_benchmark_registry_registration() -> None:
     def it_registers_and_lists_benchmarks() -> None:
         registry = BenchmarkRegistry()
 
@@ -34,7 +43,7 @@ def describe_benchmark_registry_registration():
         assert registry.get("alpha") is alpha
 
 
-def describe_benchmark_registry_duplicate_protection():
+def describe_benchmark_registry_duplicate_protection() -> None:
     def it_prevents_duplicate_registration() -> None:
         registry = BenchmarkRegistry()
 
@@ -46,7 +55,7 @@ def describe_benchmark_registry_duplicate_protection():
             registry.register("alpha", alpha)
 
 
-def describe_benchmark_registry_execution():
+def describe_benchmark_registry_execution() -> None:
     def it_runs_registered_benchmarks_with_runner() -> None:
         registry = BenchmarkRegistry()
 

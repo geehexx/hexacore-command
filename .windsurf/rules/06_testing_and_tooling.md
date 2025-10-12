@@ -30,3 +30,17 @@ globs: tests/**/*.py, src/**/*.py, *.md, *.toml, *.yaml, *.json
 * **Mandate:** A performance-first mindset must be maintained.
 * **Strategy:** The project's performance strategy is defined in ADR-0005.
 * **Requirement:** Performance-sensitive systems (e.g., pathfinding, ECS processing) MUST be benchmarked using `pytest-codspeed`.
+
+## 6.5 Network Intelligence & Source Validation
+
+* **Authoritative Sources:** Agents MUST proactively invoke `functions.*_fetch` when authoritative vendor documentation, standards, or specifications are required.
+* **Validation:** When relying on non-authoritative material retrieved via `functions.*_fetch`, agents MUST cross-reference or run internal experiments to confirm accuracy and report verification status in checkpoints or summaries.
+* **Traceability:** Each fetch call MUST include its rationale in checkpoints and summaries so reviewers can track decision inputs.
+* **Tool Prefixes:** MCP server prefixes may change; always select tooling by capability suffix (e.g., `*_fetch`) and confirm parameters against the active environment.
+
+## 6.6 Methodical Editing Workflow
+
+* **Preflight Checks:** Before applying diffs, confirm the target file and directory exist via directory listings or file reads.
+* **Create When Missing:** If a file or directory is absent, create it explicitly with the appropriate tool (e.g., `mcp1_write_file`, `mcp1_create_directory`) before diffing.
+* **Diff Discipline:** Limit `apply_patch` to verified paths and avoid replacing entire files when scoped edits suffice.
+* **Post-Edit Validation:** Immediately rerun the relevant lint or test command after modifications to ensure no regressions were introduced.

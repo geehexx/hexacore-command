@@ -1,3 +1,6 @@
+"""Event bus and world integration specs."""
+
+# ruff: noqa: S101
 from __future__ import annotations
 
 from collections import deque
@@ -7,7 +10,7 @@ from hexa_core.engine.event_bus import EventBus
 from hexa_core.engine.world import GameWorld
 
 
-def describe_event_bus():
+def describe_event_bus() -> None:
     def it_notifies_all_subscribers() -> None:
         bus = EventBus()
         received = deque()
@@ -34,7 +37,7 @@ def describe_event_bus():
         bus.publish("unhandled", {"value": 1})
 
 
-def describe_game_world():
+def describe_game_world() -> None:
     def it_creates_an_event_bus_if_none_is_provided() -> None:
         world = GameWorld()
 

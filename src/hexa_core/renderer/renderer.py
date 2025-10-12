@@ -4,7 +4,7 @@
 class HexaRenderer:
     """Placeholder renderer that will eventually integrate with Arcade."""
 
-    def run(self) -> None:
+    def run(self: "HexaRenderer") -> None:
         """Execute the render loop."""
         # TODO: Implement Arcade window and rendering pipeline.
-        print("Hexa-Core Command renderer stub running.")
+        raise NotImplementedError("Renderer run loop not yet implemented")

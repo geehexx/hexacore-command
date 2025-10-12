@@ -1,3 +1,6 @@
+"""Core datatype specification tests."""
+
+# ruff: noqa: S101
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -6,7 +9,7 @@ import pytest
 from hexa_core.engine.datatypes import Component, HexCoord
 
 
-def describe_hex_coord():
+def describe_hex_coord() -> None:
     def it_lists_all_six_neighbors() -> None:
         origin = HexCoord(0, 0)
 
@@ -32,7 +35,7 @@ class ExampleComponent(Component):
     speed: int = 0
 
 
-def describe_component_base_class():
+def describe_component_base_class() -> None:
     def it_converts_to_dict_representation() -> None:
         component = ExampleComponent(health=10, speed=3)
 

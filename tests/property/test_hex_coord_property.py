@@ -1,12 +1,20 @@
-from __future__ import annotations
+"""Property-based tests for `HexCoord`."""
 
-from hypothesis import given, strategies as st
+from __future__ import annotations
 
 from hexa_core.engine.datatypes import HexCoord
 
+# ruff: noqa: S101
+from hypothesis import given
+from hypothesis import strategies as st
+
 
 def hex_coord_strategy() -> st.SearchStrategy[HexCoord]:
-    return st.builds(HexCoord, st.integers(min_value=-500, max_value=500), st.integers(min_value=-500, max_value=500))
+    return st.builds(
+        HexCoord,
+        st.integers(min_value=-500, max_value=500),
+        st.integers(min_value=-500, max_value=500),
+    )
 
 
 @given(hex_coord_strategy())

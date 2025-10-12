@@ -5,11 +5,14 @@ from __future__ import annotations
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from itertools import count
-from typing import Any
+from typing import ParamSpec, Self, TypeVar
 
 import esper
 
 from hexa_core.engine.event_bus import EventBus, Subscriber
+
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
 class GameWorld:
@@ -17,13 +20,13 @@ class GameWorld:
 
     _context_ids = count()
 
-    def __init__(self, event_bus: EventBus | None = None) -> None:
+    def __init__(self: Self, event_bus: EventBus | None = None) -> None:
         self.context_name = f"game_world_{next(self._context_ids)}"
         self.event_bus: EventBus = event_bus or EventBus()
         self._register_context()
         # TODO: Register systems and set up initial state once implemented.
 
-    def _register_context(self) -> None:
+    def _register_context(self: Self) -> None:
         """Ensure the underlying esper context exists."""
 
         with self._activate_context():
@@ -31,7 +34,7 @@ class GameWorld:
             pass
 
     @contextmanager
-    def _activate_context(self) -> Iterator[None]:
+    def _activate_context(self: Self) -> Iterator[None]:
         previous = esper.current_world
         if previous == self.context_name:
             yield
@@ -43,15 +46,15 @@ class GameWorld:
         finally:
             esper.switch_world(previous)
 
-    def _delegate(self, func: Callable[..., Any]) -> Callable[..., Any]:
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
+    def _delegate(self: Self, func: Callable[P, R]) -> Callable[P, R]:
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             with self._activate_context():
                 return func(*args, **kwargs)
 
         return wrapper
 
-    def __getattr__(self, name: str) -> Any:
-        delegated: dict[str, Callable[..., Any]] = {
+    def __getattr__(self: Self, name: str) -> Callable[..., object]:
+        delegated: dict[str, Callable[..., object]] = {
             "create_entity": esper.create_entity,
             "delete_entity": esper.delete_entity,
             "add_component": esper.add_component,
@@ -77,12 +80,12 @@ class GameWorld:
 
         raise AttributeError(f"{type(self).__name__!s} has no attribute {name!r}")
 
-    def subscribe_event(self, event_type: str, subscriber: Subscriber) -> None:
+    def subscribe_event(self: Self, event_type: str, subscriber: Subscriber) -> None:
         """Register a subscriber on the underlying `EventBus`."""
 
         self.event_bus.subscribe(event_type, subscriber)
 
-    def publish_event(self, event_type: str, payload: dict[str, object]) -> None:
+    def publish_event(self: Self, event_type: str, payload: dict[str, object]) -> None:
         """Publish an event via the underlying `EventBus`."""
 
         self.event_bus.publish(event_type, payload)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, is_dataclass
 from dataclasses import replace as dataclass_replace
-from typing import Any, TypeVar, cast
+from typing import Any, Self, TypeVar, cast
 
 
 @dataclass(frozen=True)
@@ -14,7 +14,7 @@ class HexCoord:
     q: int
     r: int
 
-    def neighbors(self) -> tuple["HexCoord", ...]:
+    def neighbors(self: Self) -> tuple[HexCoord, ...]:
         """Return neighboring coordinates in axial directions."""
         directions = (
             (1, 0),
@@ -26,14 +26,11 @@ class HexCoord:
         )
         return tuple(HexCoord(self.q + dq, self.r + dr) for dq, dr in directions)
 
-    def distance_to(self, other: "HexCoord") -> int:
+    def distance_to(self: Self, other: HexCoord) -> int:
         """Return axial distance to another coordinate."""
         dq = self.q - other.q
         dr = self.r - other.r
         return (abs(dq) + abs(dr) + abs(dq + dr)) // 2
-
-
-ComponentType = TypeVar("ComponentType", bound="Component")
 
 
 class Component:
@@ -41,7 +38,7 @@ class Component:
 
     __slots__ = ()
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self: Self) -> dict[str, Any]:
         """Return a shallow dictionary representation of the component."""
         if not is_dataclass(self):  # pragma: no cover - defensive guard
             msg = "Component instances must be dataclasses to use to_dict()"
@@ -62,3 +59,6 @@ class Component:
 
 # TECH_DEBT: Evaluate memoizing neighbor tuples or pooling component copies if profiling reveals
 # allocation pressure during large-scale simulations.
+
+
+ComponentType = TypeVar("ComponentType", bound=Component)

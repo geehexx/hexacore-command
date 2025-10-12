@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 import esper
 
@@ -19,7 +19,7 @@ class CombatSystem(esper.Processor):
 
     world: EsperWorld  # Provided by esper.Processor
 
-    def process(self, *_: object, **__: object) -> None:  # pragma: no cover - placeholder
+    def process(self: Self, *_: object, **__: object) -> None:  # pragma: no cover - placeholder
         """Apply combat interactions between entities."""
         for _entity, _stats in self.world.get_component(StatsComponent):
             # TODO: Implement combat resolution logic.
