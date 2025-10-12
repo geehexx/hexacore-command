@@ -32,6 +32,15 @@ class MissionBriefingView:
     objectives: tuple[str, ...]
     grid_size: tuple[int, int]
 
+    @property
+    def objective_lines(self: MissionBriefingView) -> tuple[str, ...]:
+        return tuple(f"{index}. {objective}" for index, objective in enumerate(self.objectives, start=1))
+
+    @property
+    def grid_summary(self: MissionBriefingView) -> str:
+        width, height = self.grid_size
+        return f"Grid: {width} × {height}"
+
 
 class HexaRenderer:
     """Placeholder renderer that will eventually integrate with Arcade."""

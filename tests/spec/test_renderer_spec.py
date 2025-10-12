@@ -75,6 +75,28 @@ def describe_hexa_renderer() -> None:
         assert renderer.current_state is RendererState.GAMEPLAY
         assert renderer.mission_briefing is None
 
+    def it_formats_mission_briefing_for_display() -> None:
+        renderer = HexaRenderer()
+
+        renderer.load_mission_briefing(
+            {
+                "name": "Operation Dawn",
+                "objectives": [
+                    "Secure landing zone",
+                    "Extract scout team",
+                ],
+                "grid_size": {"width": 12, "height": 10},
+            }
+        )
+
+        briefing = renderer.mission_briefing
+        assert briefing is not None
+        assert briefing.objective_lines == (
+            "1. Secure landing zone",
+            "2. Extract scout team",
+        )
+        assert briefing.grid_summary == "Grid: 12 × 10"
+
 
 def describe_menu_option() -> None:
     def it_exposes_menu_option_properties() -> None:
