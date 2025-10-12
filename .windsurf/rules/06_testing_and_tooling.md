@@ -40,9 +40,10 @@ globs: tests/**/*.py, src/**/*.py, *.md, *.toml, *.yaml, *.json
 
 ## 6.6 Methodical Editing Workflow
 
-* **Preflight Checks:** Before applying diffs, confirm the target file and directory exist via directory listings or file reads.
+* **Preflight Checks:** Before applying diffs, confirm the target file and directory exist via directory listings or file reads. Create missing parents with `mcp1_create_directory` to avoid repeated failures.
 * **Create When Missing:** If a file or directory is absent, create it explicitly with the appropriate tool (e.g., `mcp1_write_file`, `mcp1_create_directory`) before diffing.
 * **Diff Discipline:** Limit `apply_patch` to verified paths and avoid replacing entire files when scoped edits suffice.
+* **Tool Selection:** Follow `docs/tooling/editing-tools.md` when choosing between Windsurf editing commands and MCP filesystem tools. Switch to MCP editors whenever context diverges or path protections block direct diffs.
 * **Post-Edit Validation:** Immediately rerun the relevant lint or test command after modifications to ensure no regressions were introduced.
 
 ## 6.7 Git Operations via MCP
