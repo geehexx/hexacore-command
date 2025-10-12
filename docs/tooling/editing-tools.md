@@ -40,3 +40,11 @@ This guide explains how to choose between Windsurf's built-in editing utilities 
 - Always confirm target directories exist before writing. If not, create them with `mcp1_create_directory`.
 - Follow the Git MCP workflow for status, diff, staging, and commits (`mcp2_git_status`, `mcp2_git_diff_*`, `mcp2_git_add`, `mcp2_git_commit`).
 - After each edit, verify with linting or tests as required (`uv run pymarkdown --config .pymarkdown.json scan .`, etc.).
+
+## Filesystem MCP Playbook
+
+- **Establish context early**: Read files via `mcp1_read_text_file` before editing to avoid stale assumptions. Pair the read with an immediate plan of attack and keep the output handy for patch creation.
+- **Create-first workflow**: When introducing new modules or specs, prefer `mcp1_write_file` for the first version. Follow with `mcp2_git_status` to confirm ownership, then iterate using targeted `apply_patch` or `mcp1_edit_file` for refinements.
+- **Guarded directories**: If a path rejects `apply_patch`, switch to `mcp1_edit_file` without retrying the failing command repeatedly. This keeps the history clean and prevents tool rate limits.
+- **Atomic diffs**: Batch related edits (code + matching tests) before staging. Use `mcp2_git_diff_unstaged` to review, then stage with a single `mcp2_git_add` call.
+- **Checkpoint cadence**: Run `mcp2_git_status` → tests → `mcp2_git_add` → `mcp2_git_commit` after every logical milestone (e.g., spec + implementation). This mirrors the `/commit` workflow and keeps long-running tasks recoverable.
