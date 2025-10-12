@@ -44,7 +44,28 @@ This guide explains how to choose between Windsurf's built-in editing utilities 
 ## Filesystem MCP Playbook
 
 - **Establish context early**: Read files via `mcp1_read_text_file` before editing to avoid stale assumptions. Pair the read with an immediate plan of attack and keep the output handy for patch creation.
+- **Batch reads**: Prefer `mcp1_read_multiple_files` whenever you need parallel snapshots (e.g., reviewing related specs and implementations). It tolerates single-file failures without aborting the batch, so you can diff partial results quickly.
 - **Create-first workflow**: When introducing new modules or specs, prefer `mcp1_write_file` for the first version. Follow with `mcp2_git_status` to confirm ownership, then iterate using targeted `apply_patch` or `mcp1_edit_file` for refinements.
+- **Directory helpers**: Use `mcp1_list_directory`, `mcp1_list_directory_with_sizes`, or `mcp1_directory_tree` to inspect structure before writing. Pair with `mcp1_create_directory` so parents exist prior to file writes. For metadata (timestamps, permissions), call `mcp1_get_file_info`.
 - **Guarded directories**: If a path rejects `apply_patch`, switch to `mcp1_edit_file` without retrying the failing command repeatedly. This keeps the history clean and prevents tool rate limits.
 - **Atomic diffs**: Batch related edits (code + matching tests) before staging. Use `mcp2_git_diff_unstaged` to review, then stage with a single `mcp2_git_add` call.
 - **Checkpoint cadence**: Run `mcp2_git_status` → tests → `mcp2_git_add` → `mcp2_git_commit` after every logical milestone (e.g., spec + implementation). This mirrors the `/commit` workflow and keeps long-running tasks recoverable.
+
+## Search Strategy
+
+- **Dual-path search**: Combine IDE or built-in search with MCP discovery. Run your local search first for rapid feedback, then call `mcp1_search_files` (glob-based) or `grep_search` for authoritative results. When possible, reconcile both outputs before acting.
+- **Directory snapshots**: If searching across large trees, generate a `mcp1_directory_tree` snapshot to confirm coverage and note excluded directories.
+- **Follow-up reads**: After locating files, use `mcp1_read_multiple_files` for parallel context or `mcp1_read_text_file` for targeted sections.
+
+## Fetch & External Resources
+
+- **Retry on conversion failures**: If `mcp0_fetch` fails to simplify HTML, re-run with `raw=true` to retrieve the original content. Use `start_index` pagination to stream long pages in chunks.
+- **Local conversion**: When raw HTML is returned, apply local utilities (e.g., markdownifier scripts) before summarizing to conserve tokens.
+- **Security posture**: Remember the fetch server can reach internal networks; verify URLs before calling `mcp0_fetch`.
+
+## MCP Server Reference
+
+- **Filesystem** (`mcp-server-filesystem`): Full suite of file operations scoped to allowed roots; configured with project root access.
+- **Git** (`mcp-server-git`): Primary interface for status, diff, staging, commits, branching, and logs.
+- **Fetch** (`mcp-server-fetch`): Web retrieval with markdown/raw modes; supports chunked reads via `start_index`.
+- **Time** (`mcp-server-time`): Provides `get_current_time` and `convert_time` using IANA zone names. Minimal use today, but list it for completeness.
