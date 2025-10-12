@@ -3,7 +3,13 @@
 from __future__ import annotations
 
 # ruff: noqa: S101
-from hexa_core.renderer.renderer import HexaRenderer, MenuOption, RendererState
+from hexa_core.renderer.renderer import (
+    HexaRenderer,
+    MapPreviewInfo,
+    MenuOption,
+    ObjectiveBlock,
+    RendererState,
+)
 
 
 def describe_hexa_renderer() -> None:
@@ -96,6 +102,90 @@ def describe_hexa_renderer() -> None:
             "2. Extract scout team",
         )
         assert briefing.grid_summary == "Grid: 12 × 10"
+
+    def it_wraps_objectives_into_text_blocks() -> None:
+        renderer = HexaRenderer()
+
+        renderer.load_mission_briefing(
+            {
+                "name": "Operation Dawn",
+                "objectives": [
+                    "Secure landing zone to allow supply drops to land safely.",
+                    "Extract scout team before enemy reinforcements arrive.",
+                ],
+                "grid_size": {"width": 12, "height": 10},
+            }
+        )
+
+        briefing = renderer.mission_briefing
+        assert briefing is not None
+
+        blocks = briefing.objective_blocks(max_width=45)
+
+        assert blocks == (
+            ObjectiveBlock(
+                heading="Objective 1",
+                lines=(
+                    "Secure landing zone to allow supply",
+                    "drops to land safely.",
+                ),
+            ),
+            ObjectiveBlock(
+                heading="Objective 2",
+                lines=(
+                    "Extract scout team before enemy",
+                    "reinforcements arrive.",
+                ),
+            ),
+        )
+
+    def it_exposes_map_preview_metadata() -> None:
+        renderer = HexaRenderer()
+
+        renderer.load_mission_briefing(
+            {
+                "name": "Operation Dawn",
+                "objectives": [],
+                "grid_size": {"width": 12, "height": 10},
+                "preview": {
+                    "image": "assets/maps/operation_dawn.png",
+                    "width": 384,
+                    "height": 256,
+                    "alt_text": "Operation Dawn tactical overview",
+                },
+            }
+        )
+
+        briefing = renderer.mission_briefing
+        assert briefing is not None
+        assert briefing.map_preview == MapPreviewInfo(
+            asset_path="assets/maps/operation_dawn.png",
+            dimensions=(384, 256),
+            alt_text="Operation Dawn tactical overview",
+        )
+
+    def it_provides_interaction_cues() -> None:
+        renderer = HexaRenderer()
+
+        renderer.load_mission_briefing(
+            {
+                "name": "Operation Dawn",
+                "objectives": [],
+                "grid_size": {"width": 12, "height": 10},
+                "interaction": {
+                    "primary": "Press [Enter] to deploy",
+                    "secondary": "Press [Esc] to review",
+                    "hints": ["Press [M] to toggle map"],
+                },
+            }
+        )
+
+        briefing = renderer.mission_briefing
+        assert briefing is not None
+        cues = briefing.interaction_cues
+        assert cues.primary == "Press [Enter] to deploy"
+        assert cues.secondary == "Press [Esc] to review"
+        assert cues.hints == ("Press [M] to toggle map",)
 
 
 def describe_menu_option() -> None:

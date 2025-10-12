@@ -29,9 +29,13 @@
 **Requirements:**
 
 * Display mission information loaded from a map file (e.g., `assets/maps/level_01.json`).
+  * Status: dataclass helpers (`MissionBriefingView`, `MapPreviewInfo`, `InteractionCues`) normalize payloads for renderer consumption.
 * Show primary objectives.
+  * Status: deterministic formatting via `objective_lines` and `objective_blocks(max_width)` spec-tested.
 * Display a simplified grid schematic.
+  * Status: `grid_summary` exposes width × height metadata for UI widgets.
 * The "Proceed to Editor" button should transition to the Gameplay UI.
+  * Status: `proceed_to_gameplay()` keeps state ready for upcoming UI wiring.
 
 ### 1.3 Gameplay UI
 
@@ -52,7 +56,7 @@
 
 * [x] **Task 1:** Implement the `HexaRenderer` to display the Main Menu screen.
 * [x] **Task 2:** Implement the state transition to the Mission Briefing screen.
-* [ ] **Task 3:** Implement data loading and display for the Mission Briefing screen.
+* [x] **Task 3:** Implement data loading and display for the Mission Briefing screen.
 * [ ] **Task 4:** Implement the state transition to the Gameplay UI screen.
 * [ ] **Task 5:** Implement the basic layout of the Gameplay UI (Grid, Editor, Status panels).
 * [x] **Task 6:** Create `docs/renderer.md` as the living documentation for the UI and archive this initiative.

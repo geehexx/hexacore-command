@@ -21,9 +21,13 @@ The renderer provides Arcade-facing presentation for Hexa-Core Command while hon
 - **MainMenuView** and **MenuOption**
   - Immutable data structures describing the main menu layout, option labeling, and enablement.
   - Supports deterministic testing by exposing the menu model without Arcade dependencies.
-- **MissionBriefingView**
-  - Captures mission metadata (title, objectives, grid dimensions) loaded from map payloads.
-  - Enables future rendering of objective lists and mini-map previews without coupling to file I/O.
+- **MissionBriefingView** and companion dataclasses
+  - Captures mission metadata: objectives, grid dimensions, optional map preview imagery, and interaction cues loaded from map payloads.
+  - Provides deterministic helpers:
+    - `objective_lines` for numbered bullet output.
+    - `objective_blocks(max_width)` for line-wrapped text blocks (`ObjectiveBlock`).
+    - `grid_summary` for concise layout data.
+    - `map_preview` (`MapPreviewInfo`) and `interaction_cues` (`InteractionCues`) surface renderer-agnostic metadata for UI widgets.
 
 ## Implementation Details
 
@@ -32,6 +36,7 @@ The renderer provides Arcade-facing presentation for Hexa-Core Command while hon
   - `load_mission_briefing()` normalizes level metadata into `MissionBriefingView`, updating state while preserving determinism for tests.
   - `proceed_to_gameplay()` clears briefing data and shifts the renderer into `GAMEPLAY`, ready for upcoming scene composition.
 - The renderer remains Arcade-agnostic; UI structures are pure dataclasses, facilitating spec-kit tests (`tests/spec/test_renderer_spec.py`) that drive incremental feature delivery under TDD.
+  - New specs assert objective wrapping, preview metadata, and interaction cue formatting to guard mission briefing regressions.
 
 ## Code Examples
 
