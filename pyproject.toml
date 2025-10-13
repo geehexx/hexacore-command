@@ -23,7 +23,8 @@ dev = [
   "hypothesis==6.99.0",
   "types-Pygments",
   "pytest-cov==4.1.0",
-  "pip-audit==2.7.2"
+  "pip-audit==2.7.2",
+  "xenon==0.9.3"
 ]
 
 [tool.pytest.ini_options]

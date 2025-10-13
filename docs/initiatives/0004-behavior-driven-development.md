@@ -5,16 +5,29 @@
 
 ## Plan
 
-1. **Add Dependency:** Ensure [`pytest-bdd`](https://pytest-bdd.readthedocs.io/) is part of the `[project.optional-dependencies]` `dev` group in `pyproject.toml`.
-2. **Establish Two-Tiered Testing Strategy:**
-    * Update `.windsurf/rules/06_testing_and_tooling.md` to formalize a two-tiered testing approach:
-        * **Behavior-Level Tests (BDD):** High-level acceptance and integration tests will be written using `pytest-bdd` in Gherkin (`.feature`) files. These live in `tests/features/`.
-        * **Unit-Level Tests (Spec-Driven):** Low-level unit tests continue to use the `spec-kit` (`pytest-describe`) style in `tests/spec/`.
-3. **Create Scaffolding:**
-    * Provide canonical feature files in `tests/features/`, starting with `bot_movement.feature`.
-    * Implement corresponding step definitions (e.g., `tests/features/test_bot_movement_bdd.py`) that exercise real engine services (event bus, world) instead of placeholders.
-4. **Update Taskfile:** Maintain the dedicated `test:bdd` task in `Taskfile.yml` to run `pytest tests/features`.
-5. **Document Practices:** Capture BDD authoring guidance in the living documentation set alongside CodSpeed usage notes.
+### Add Dependency
+
+* Ensure [`pytest-bdd`](https://pytest-bdd.readthedocs.io/) is part of the `[project.optional-dependencies]` `dev` group in `pyproject.toml`.
+
+### Establish Two-Tiered Testing Strategy
+
+* Update `.windsurf/rules/06_testing_and_tooling.md` to formalize a two-tiered testing approach.
+* Define two layers of coverage:
+  * **Behavior-Level Tests (BDD):** High-level acceptance and integration tests will be written using `pytest-bdd` in Gherkin (`.feature`) files. These live in `tests/features/`.
+  * **Unit-Level Tests (Spec-Driven):** Low-level unit tests continue to use the `spec-kit` (`pytest-describe`) style in `tests/spec/`.
+
+### Create Scaffolding
+
+* Provide canonical feature files in `tests/features/`, starting with `bot_movement.feature`.
+* Implement corresponding step definitions (e.g., `tests/features/test_bot_movement_bdd.py`) that exercise real engine services (event bus, world) instead of placeholders.
+
+### Update Taskfile
+
+* Maintain the dedicated `test:bdd` task in `Taskfile.yml` to run `pytest tests/features`.
+
+### Document Practices
+
+* Capture BDD authoring guidance in the living documentation set alongside CodSpeed usage notes.
 
 ## TODO
 

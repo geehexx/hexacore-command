@@ -4,6 +4,7 @@ from __future__ import annotations
 
 # ruff: noqa: S101
 from collections import deque
+from typing import cast
 
 import pytest
 from hexa_core.engine.components import CombatIntentComponent, StatsComponent
@@ -21,8 +22,8 @@ def describe_combat_system() -> None:
         combat_system = CombatSystem(event_bus=bus)
         world.add_processor(combat_system)
 
-        attacker = world.create_entity()
-        target = world.create_entity()
+        attacker = cast(int, world.create_entity())
+        target = cast(int, world.create_entity())
         world.add_component(attacker, StatsComponent(health=100, speed=50, processor=100))
         world.add_component(target, StatsComponent(health=60, speed=40, processor=80))
         world.add_component(attacker, CombatIntentComponent(target=target, damage=35))
@@ -32,7 +33,7 @@ def describe_combat_system() -> None:
 
         world.process()
 
-        target_stats = world.component_for_entity(target, StatsComponent)
+        target_stats = cast(StatsComponent, world.component_for_entity(target, StatsComponent))
         assert target_stats.health == 25
         assert world.try_component(attacker, CombatIntentComponent) is None
         assert list(captured) == [
@@ -57,8 +58,8 @@ def describe_combat_system() -> None:
         combat_system = CombatSystem(event_bus=bus)
         world.add_processor(combat_system)
 
-        attacker = world.create_entity()
-        target = world.create_entity()
+        attacker = cast(int, world.create_entity())
+        target = cast(int, world.create_entity())
         world.add_component(attacker, StatsComponent(health=70, speed=30, processor=60))
         world.add_component(target, StatsComponent(health=40, speed=20, processor=40))
         world.add_component(attacker, CombatIntentComponent(target=target, damage=50))
@@ -68,7 +69,7 @@ def describe_combat_system() -> None:
 
         world.process()
 
-        target_stats = world.component_for_entity(target, StatsComponent)
+        target_stats = cast(StatsComponent, world.component_for_entity(target, StatsComponent))
         assert target_stats.health == 0
         assert list(captured) == [
             (

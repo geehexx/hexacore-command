@@ -69,9 +69,7 @@ class WindsurfFrontMatterValidator(RulePlugin):
                 message="Front matter header (`---`) is required for Windsurf documents.",
             )
 
-    def next_token(
-        self: Self, context: PluginScanContext, token: MarkdownToken
-    ) -> None:
+    def next_token(self: Self, context: PluginScanContext, token: MarkdownToken) -> None:
         if self._category is None:
             self._initialize_category(context.scan_file)
 
@@ -95,14 +93,9 @@ class WindsurfFrontMatterValidator(RulePlugin):
         if self._category is not None:
             self._scan_path = candidate
 
-    def _validate_front_matter(
-        self: Self, context: PluginScanContext, token: MarkdownToken
-    ) -> None:
+    def _validate_front_matter(self: Self, context: PluginScanContext, token: MarkdownToken) -> None:
         front_token = self._as_front_matter(token)
-        mapping = {
-            str(key): str(value)
-            for key, value in front_token.matter_map.items()
-        }
+        mapping = {str(key): str(value) for key, value in front_token.matter_map.items()}
 
         if self._category == "workflow":
             self._validate_workflow(context, front_token, mapping)
@@ -122,9 +115,7 @@ class WindsurfFrontMatterValidator(RulePlugin):
         mapping: dict[str, str],
     ) -> None:
         errors = []
-        errors.extend(
-            self._validate_description(mapping, self._WORKFLOW_CONFIG)
-        )
+        errors.extend(self._validate_description(mapping, self._WORKFLOW_CONFIG))
         errors.extend(self._validate_auto_execution_mode(mapping))
         errors.extend(self._validate_workflow_filename())
         self._emit_errors(context, token, errors)
@@ -179,8 +170,7 @@ class WindsurfFrontMatterValidator(RulePlugin):
             return ["`description` is required in front matter."]
         if len(description) < config.description_min_length:
             return [
-                "`description` must be at least "
-                f"{config.description_min_length} characters long.",
+                "`description` must be at least " f"{config.description_min_length} characters long.",
             ]
         return []
 
@@ -207,7 +197,5 @@ class WindsurfFrontMatterValidator(RulePlugin):
         if len(stem) < 4:
             errors.append("Workflow file name must be at least 4 characters long.")
         if not WORKFLOW_NAME_PATTERN.fullmatch(stem):
-            errors.append(
-                "Workflow file name must match the pattern `^[\\w\\d _-]+$`."
-            )
+            errors.append("Workflow file name must match the pattern `^[\\w\\d _-]+$`.")
         return errors

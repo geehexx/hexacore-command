@@ -5,18 +5,30 @@
 
 ## Plan
 
-1. **Migrate Benchmarking Tool:**
-    * Remove `pytest-benchmark` from the `dev` dependencies in `pyproject.toml`.
-    * Add [`pytest-codspeed`](https://docs.codspeed.io/docs/pytest/overview) to the `dev` dependencies. `pytest-codspeed` is compatible with parallel execution.
-2. **Enable Parallel Execution:**
-    * Add [`pytest-xdist`](https://pytest-xdist.readthedocs.io/) to the `dev` dependencies in `pyproject.toml`.
-3. **Update Automation Tasks:**
-    * Modify `Taskfile.yml` to introduce parallel execution commands:
-        * Add a new task `test:unit:parallel` that runs `pytest -n auto tests/spec/`.
-        * Update the `test:benchmarks` and `ci:benchmarks` tasks to execute `pytest --codspeed -n auto tests/benchmarks/`.
-4. **Update Documentation:**
-    * In `docs/decisions/0005-performance-and-benchmarking-strategy.md`, replace all mentions of `pytest-benchmark` with `pytest-codspeed` and update helper references accordingly.
-    * In `.windsurf/rules/06_testing_and_tooling.md`, update the description of performance testing to reference `pytest-codspeed`.
+### Migrate Benchmarking Tool
+
+* Remove `pytest-benchmark` from the `dev` dependencies in `pyproject.toml`.
+* Add [`pytest-codspeed`](https://docs.codspeed.io/docs/pytest/overview) to the `dev`
+  dependencies. `pytest-codspeed` is compatible with parallel execution.
+
+### Enable Parallel Execution
+
+* Add [`pytest-xdist`](https://pytest-xdist.readthedocs.io/) to the `dev` dependencies in
+  `pyproject.toml`.
+
+### Update Automation Tasks
+
+* Modify `Taskfile.yml` to introduce parallel execution commands:
+  * Add a new task `test:unit:parallel` that runs `pytest -n auto tests/spec/`.
+  * Update the `test:benchmarks` and `ci:benchmarks` tasks to execute `pytest --codspeed -n auto
+    tests/benchmarks/`.
+
+### Update Documentation
+
+* In `docs/decisions/0005-performance-and-benchmarking-strategy.md`, replace all mentions of
+  `pytest-benchmark` with `pytest-codspeed` and update helper references accordingly.
+* In `.windsurf/rules/06_testing_and_tooling.md`, update the description of performance testing to
+  reference `pytest-codspeed`.
 
 ## Affected Files
 

@@ -17,13 +17,15 @@ globs: tests/**/*.py, src/**/*.py, *.md, *.toml, *.yaml, *.json
 
 ## 6.3 Code Quality & Automation
 
-* **Tooling:** `Ruff`, `MyPy`, and `markdownlint` are the standard for quality, enforced by `pre-commit` hooks.
+* **Tooling:** `Ruff`, `MyPy`, `markdownlint`, `Radon`, and `Xenon` are the standard for quality, enforced by `pre-commit` hooks.
 * **Automation:** Use the Taskfile targets to execute repeatable workflows:
   * `task lint:all` runs Ruff, MyPy, and PyMarkdown in sequence.
+  * `task lint:complexity` runs Radon complexity analysis.
   * `task test:unit` runs the full pytest suite.
   * `task ci:check` chains linting and unit tests for CI validation.
   * `task ci:benchmarks` runs the benchmark suite when performance validation is required.
 * **Self-Validation:** Contributors MUST execute the relevant Taskfile targets locally (tests, benchmarks, or linting) before delivering checkpoints or status summaries.
+  `pre-commit run --all-files` now includes the Xenon complexity gate to prevent high-complexity commits.
 
 ## 6.4 Performance & Benchmarking
 
@@ -43,12 +45,15 @@ globs: tests/**/*.py, src/**/*.py, *.md, *.toml, *.yaml, *.json
 * **Preflight Checks:** Before applying diffs, confirm the target file and directory exist via directory listings or file reads. Create missing parents with `mcp1_create_directory` to avoid repeated failures.
 * **Create When Missing:** If a file or directory is absent, create it explicitly with the appropriate tool (e.g., `mcp1_write_file`, `mcp1_create_directory`) before diffing.
 * **Diff Discipline:** Limit `apply_patch` to verified paths and avoid replacing entire files when scoped edits suffice.
-* **Tool Selection:** Follow `docs/tooling/editing-tools.md` when choosing between Windsurf editing commands and MCP filesystem tools. Always switch to MCP editors whenever context diverges or path protections block direct diffs, and ensure you read the response to the command to confirm the action was successful.
+* **Tool Selection:** Follow `docs/tooling/editing-tools.md` when choosing between Windsurf editing commands and MCP filesystem tools.
+  Always switch to MCP editors whenever context diverges or path protections block direct diffs, and ensure you read the response to the command to confirm the action was successful.
 * **Post-Edit Validation:** Immediately rerun the relevant lint or test command after modifications to ensure no regressions were introduced.
 
 ## 6.7 Git Operations via MCP
 
-* **Primary Interfaces:** All status, diff, staging, and commit actions MUST be executed through MCP Git tools (`mcp2_git_status`, `mcp2_git_diff_unstaged`, `mcp2_git_diff_staged`, `mcp2_git_add`, `mcp2_git_commit`). Direct CLI commands are reserved for exceptional cases when the MCP interface is unavailable, and the reason MUST be documented.
+* **Primary Interfaces:** All status, diff, staging, and commit actions MUST be executed through MCP Git tools (`mcp2_git_status`, `mcp2_git_diff_unstaged`, `mcp2_git_diff_staged`, `mcp2_git_add`, `mcp2_git_commit`).
+  Direct CLI commands are reserved for exceptional cases when the MCP interface is unavailable,
+  and the reason MUST be documented.
 * **Status Discipline:** Run `mcp2_git_status` before and after significant edits to maintain awareness of the working tree and to capture checkpoints for status summaries.
 * **Diff Review:** Inspect changes with `mcp2_git_diff_unstaged` and `mcp2_git_diff_staged`, adjusting context as needed to understand every modification.
 

@@ -65,6 +65,12 @@ tasks:
     cmds:
       - "{{.UV}} run pymarkdown --config .pymarkdown.json scan ."
 
+  lint:complexity:
+    desc: Analyze code complexity with Radon metrics.
+    cmds:
+      - "{{.UV}} run radon cc -s -a src"
+      - "{{.UV}} run radon mi -s src"
+
   lint:all:
     desc: Run all linting tasks (Ruff, MyPy, Markdown).
     deps:

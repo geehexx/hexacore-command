@@ -16,12 +16,8 @@ def describe_asset_manifest() -> None:
         manifest_path.write_text(
             json.dumps(
                 {
-                    "sprites": {
-                        "hero": "assets/sprites/hero.png"
-                    },
-                    "sounds": {
-                        "laser": "assets/sfx/laser.wav"
-                    },
+                    "sprites": {"hero": "assets/sprites/hero.png"},
+                    "sounds": {"laser": "assets/sfx/laser.wav"},
                 }
             ),
             encoding="utf-8",
@@ -33,7 +29,7 @@ def describe_asset_manifest() -> None:
         assert manifest.get_asset_path("sounds", "laser") == Path("assets/sfx/laser.wav")
 
     def it_raises_for_missing_asset() -> None:
-        manifest = AssetManifest({"sprites": {"hero": "hero.png"}})
+        manifest = AssetManifest({"sprites": {"hero": Path("hero.png")}})
 
         with pytest.raises(KeyError):
             manifest.get_asset_path("sprites", "villain")
@@ -52,18 +48,8 @@ def describe_map_loader() -> None:
                 {
                     "name": "Test Map",
                     "grid_size": {"width": 2, "height": 2},
-                    "tiles": [
-                        {"type": "floor", "q": 0, "r": 0}
-                    ],
-                    "entities": [
-                        {
-                            "name": "Player",
-                            "components": {
-                                "Position": {"q": 0, "r": 0},
-                                "Stats": {"health": 100, "speed": 50, "processor": 100}
-                            }
-                        }
-                    ]
+                    "tiles": [{"type": "floor", "q": 0, "r": 0}],
+                    "entities": [{"name": "Player", "components": {"Position": {"q": 0, "r": 0}, "Stats": {"health": 100, "speed": 50, "processor": 100}}}],
                 }
             ),
             encoding="utf-8",

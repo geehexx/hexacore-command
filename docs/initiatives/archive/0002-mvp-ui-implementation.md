@@ -64,4 +64,5 @@
 > **Archive Note:** Gameplay UI delivery now continues under `docs/initiatives/0006-arcade-renderer-integration.md`.
 
 ## 3. Final Confirmation
+
 After creating the files, confirm that the plan has been executed successfully.

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from collections import deque
+from typing import cast
 
 import esper
 from hexa_core.engine.event_bus import EventBus
@@ -13,7 +14,7 @@ from hexa_core.engine.world import GameWorld
 def describe_event_bus() -> None:
     def it_notifies_all_subscribers() -> None:
         bus = EventBus()
-        received = deque()
+        received: deque[tuple[str, int]] = deque()
 
         def subscriber_one(event_type: str, payload: dict[str, int]) -> None:
             received.append((event_type, payload["value"]))
@@ -52,7 +53,7 @@ def describe_game_world() -> None:
 
     def it_exposes_subscribe_and_publish_helpers() -> None:
         world = GameWorld()
-        received = deque()
+        received: deque[int] = deque()
 
         world.subscribe_event("engine.tick", lambda _event, payload: received.append(payload["tick"]))
 
@@ -63,7 +64,7 @@ def describe_game_world() -> None:
     def it_registers_an_esper_context() -> None:
         world = GameWorld()
 
-        entity = world.create_entity()
+        entity = cast(int, world.create_entity())
         world.delete_entity(entity)
 
         assert world.context_name in esper.list_worlds()

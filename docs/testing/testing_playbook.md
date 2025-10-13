@@ -2,16 +2,20 @@
 
 ## Metadata
 
-| Key | Value |
-| --- | --- |
-| Topic | Hexa-Core Command Testing Architecture |
-| Keywords | testing, spec-kit, pytest-bdd, hypothesis, codspeed |
-| Related ADRs | [ADR-0005](../decisions/0005-performance-and-benchmarking-strategy.md) |
-| Key Libraries | [`pytest`](https://docs.pytest.org/), [`spec-kit`](https://github.com/github/spec-kit), [`pytest-bdd`](https://pytest-bdd.readthedocs.io/), [`hypothesis`](https://hypothesis.readthedocs.io/), [`pytest-codspeed`](https://docs.codspeed.io/docs/pytest/overview) |
+- **Topic:** Hexa-Core Command Testing Architecture
+- **Keywords:** testing, spec-kit, pytest-bdd, hypothesis, codspeed
+- **Related ADRs:** [ADR-0005](../decisions/0005-performance-and-benchmarking-strategy.md)
+- **Key Libraries:**
+  - [`pytest`](https://docs.pytest.org/)
+  - [`spec-kit`](https://github.com/github/spec-kit)
+  - [`pytest-bdd`](https://pytest-bdd.readthedocs.io/)
+  - [`hypothesis`](https://hypothesis.readthedocs.io/)
+  - [`pytest-codspeed`](https://docs.codspeed.io/docs/pytest/overview)
 
 ## Overview
 
-Hexa-Core Command relies on a layered testing strategy to keep the engine deterministic and observable. This playbook explains how each testing style is applied and which automation targets exercise them.
+Hexa-Core Command relies on a layered testing strategy to keep the engine deterministic and observable.
+This playbook explains how each testing style is applied and which automation targets exercise them.
 
 ## Spec Tests (`tests/spec/`)
 

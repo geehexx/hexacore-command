@@ -20,11 +20,11 @@ repos:
   rev: v0.9.18
   hooks:
   - id: pymarkdown
-- repo: local
+- repo: https://github.com/rubik/xenon
+  rev: v0.9.3
   hooks:
-  - id: radon-cc
-    name: Radon Cyclomatic Complexity
-    entry: radon
-    args: ["cc", "--max", "B"]
-    language: system
-    types: [python]
+  - id: xenon
+    args:
+      - --max-absolute=B
+      - --max-modules=A
+      - --max-average=A

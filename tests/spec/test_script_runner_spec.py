@@ -11,10 +11,10 @@ def describe_script_runner() -> None:
     def it_sets_variables_and_halts_on_end() -> None:
         runner = ScriptRunner()
         runner.load(
-            '\n'.join(
+            "\n".join(
                 [
                     'SET "target" 3',
-                    'END',
+                    "END",
                 ]
             )
         )
@@ -29,13 +29,13 @@ def describe_script_runner() -> None:
     def it_evaluates_condition_and_loops_until_threshold() -> None:
         runner = ScriptRunner()
         runner.load(
-            '\n'.join(
+            "\n".join(
                 [
                     'SET "counter" 3',
                     'LABEL "loop"',
                     'SET "counter" ( counter - 1 )',
                     'IF counter > 0 THEN GOTO "loop"',
-                    'END',
+                    "END",
                 ]
             )
         )
@@ -50,10 +50,10 @@ def describe_script_runner() -> None:
     def it_records_action_invocations() -> None:
         runner = ScriptRunner()
         runner.load(
-            '\n'.join(
+            "\n".join(
                 [
                     'ACTION "move" "north"',
-                    'END',
+                    "END",
                 ]
             )
         )
@@ -68,10 +68,10 @@ def describe_script_runner() -> None:
     def it_raises_runtime_error_for_unknown_label() -> None:
         runner = ScriptRunner()
         runner.load(
-            '\n'.join(
+            "\n".join(
                 [
                     'GOTO "missing"',
-                    'END',
+                    "END",
                 ]
             )
         )

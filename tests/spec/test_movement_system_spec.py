@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from collections import deque
+from typing import cast
 
 from hexa_core.engine.components import MovementIntentComponent, PositionComponent
 from hexa_core.engine.datatypes import HexCoord
@@ -21,7 +22,7 @@ def describe_movement_system() -> None:
         movement_system = MovementSystem(event_bus=bus)
         world.add_processor(movement_system)
 
-        entity = world.create_entity()
+        entity = cast(int, world.create_entity())
         world.add_component(entity, PositionComponent(q=0, r=0))
         world.add_component(entity, MovementIntentComponent(target=HexCoord(1, 0)))
 
@@ -30,7 +31,7 @@ def describe_movement_system() -> None:
 
         world.process()
 
-        position = world.component_for_entity(entity, PositionComponent)
+        position = cast(PositionComponent, world.component_for_entity(entity, PositionComponent))
         assert (position.q, position.r) == (1, 0)
         assert world.try_component(entity, MovementIntentComponent) is None
 
@@ -54,7 +55,7 @@ def describe_movement_system() -> None:
         movement_system = MovementSystem(event_bus=bus)
         world.add_processor(movement_system)
 
-        entity = world.create_entity()
+        entity = cast(int, world.create_entity())
         world.add_component(entity, PositionComponent(q=2, r=-1))
         world.add_component(entity, MovementIntentComponent(target=HexCoord(3, -1)))
 
@@ -64,5 +65,5 @@ def describe_movement_system() -> None:
 
         world.process()
 
-        position = world.component_for_entity(entity, PositionComponent)
+        position = cast(PositionComponent, world.component_for_entity(entity, PositionComponent))
         assert (position.q, position.r) == (3, 0)

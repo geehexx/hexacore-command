@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 # ruff: noqa: S101
+from typing import cast
+
 import pytest
 from hexa_core.engine.components import StatsComponent, TurnComponent
 from hexa_core.engine.world import GameWorld
@@ -15,7 +17,7 @@ def _setup_world(speed: int, initial_counter: int = 0) -> tuple[GameWorld, int, 
     turn_manager = TurnManager(world.event_bus)
     world.add_processor(turn_manager)
 
-    entity = world.create_entity()
+    entity = cast(int, world.create_entity())
     world.add_component(entity, StatsComponent(health=100, speed=speed, processor=100))
     world.add_component(entity, TurnComponent(turn_counter=initial_counter))
 
@@ -34,7 +36,7 @@ def describe_turn_manager() -> None:
         world, entity, _ = _setup_world(speed=125)
 
         world.process()
-        turn = world.component_for_entity(entity, TurnComponent)
+        turn = cast(TurnComponent, world.component_for_entity(entity, TurnComponent))
 
         assert turn.turn_counter == 125
         assert turn.ready is False
@@ -44,7 +46,7 @@ def describe_turn_manager() -> None:
 
         world.process()
         world.process()
-        turn = world.component_for_entity(entity, TurnComponent)
+        turn = cast(TurnComponent, world.component_for_entity(entity, TurnComponent))
 
         from hexa_core.engine.systems.turn_system import ACTION_THRESHOLD
 
@@ -67,12 +69,12 @@ def describe_turn_manager() -> None:
 
         from hexa_core.engine.systems.turn_system import ACTION_THRESHOLD
 
-        turn = world.component_for_entity(entity, TurnComponent)
+        turn = cast(TurnComponent, world.component_for_entity(entity, TurnComponent))
         assert turn.ready is True
 
         world.consume_turn(entity)
 
-        turn = world.component_for_entity(entity, TurnComponent)
+        turn = cast(TurnComponent, world.component_for_entity(entity, TurnComponent))
 
         assert turn.ready is False
         assert 0 <= turn.turn_counter < ACTION_THRESHOLD

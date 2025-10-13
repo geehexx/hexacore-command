@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
@@ -217,49 +217,7 @@ class HexaRenderer:
         self.current_state = self._transitions.get(action, self.current_state)
 
     def load_mission_briefing(self: HexaRenderer, payload: dict[str, object]) -> None:
-        name = str(payload.get("name", ""))
-        objectives_raw = payload.get("objectives", [])
-        objectives_iter = (
-            objectives_raw
-            if isinstance(objectives_raw, Iterable) and not isinstance(objectives_raw, str | bytes)
-            else ()
-        )
-        objectives = tuple(str(item) for item in objectives_iter)
-        grid_section = payload.get("grid_size", {})
-        width = 0
-        height = 0
-        if isinstance(grid_section, dict):
-            width = int(grid_section.get("width", 0))
-            height = int(grid_section.get("height", 0))
-        preview_section = payload.get("preview", {})
-        preview: MapPreviewInfo | None = None
-        if isinstance(preview_section, dict):
-            asset_path = str(preview_section.get("image", ""))
-            preview_width = int(preview_section.get("width", 0))
-            preview_height = int(preview_section.get("height", 0))
-            alt_text = str(preview_section.get("alt_text", ""))
-            if asset_path:
-                preview = MapPreviewInfo(asset_path, (preview_width, preview_height), alt_text)
-        interaction_section = payload.get("interaction", {})
-        cues = InteractionCues.default()
-        if isinstance(interaction_section, dict):
-            primary = str(interaction_section.get("primary", ""))
-            secondary = str(interaction_section.get("secondary", ""))
-            hints_raw = interaction_section.get("hints", ())
-            hints_iter = (
-                hints_raw
-                if isinstance(hints_raw, Iterable) and not isinstance(hints_raw, str | bytes)
-                else ()
-            )
-            hints = tuple(str(item) for item in hints_iter)
-            cues = InteractionCues(primary=primary, secondary=secondary, hints=hints)
-        self.mission_briefing = MissionBriefingView(
-            name,
-            objectives,
-            (width, height),
-            map_preview=preview,
-            interaction_cues=cues,
-        )
+        self.mission_briefing = self._create_mission_briefing_view(payload)
         self.current_state = RendererState.MISSION_BRIEFING
         self.should_exit = False
 
@@ -299,3 +257,51 @@ class HexaRenderer:
             bot_status=bot_status,
             controls=controls,
         )
+
+    def _create_mission_briefing_view(self: HexaRenderer, payload: Mapping[str, object]) -> MissionBriefingView:
+        name = str(payload.get("name", ""))
+        objectives = self._coerce_string_iterable(payload.get("objectives"))
+        grid_size = self._parse_grid(payload.get("grid_size"))
+        preview = self._parse_preview(payload.get("preview"))
+        interaction_cues = self._parse_interaction(payload.get("interaction"))
+        return MissionBriefingView(
+            name,
+            objectives,
+            grid_size,
+            map_preview=preview,
+            interaction_cues=interaction_cues,
+        )
+
+    @staticmethod
+    def _coerce_string_iterable(value: object) -> tuple[str, ...]:
+        if isinstance(value, Iterable) and not isinstance(value, str | bytes):
+            return tuple(str(item) for item in value)
+        return ()
+
+    @staticmethod
+    def _parse_grid(section: object) -> tuple[int, int]:
+        if isinstance(section, Mapping):
+            width = int(section.get("width", 0))
+            height = int(section.get("height", 0))
+            return width, height
+        return 0, 0
+
+    @staticmethod
+    def _parse_preview(section: object) -> MapPreviewInfo | None:
+        if not isinstance(section, Mapping):
+            return None
+        asset_path = str(section.get("image", ""))
+        if not asset_path:
+            return None
+        preview_width = int(section.get("width", 0))
+        preview_height = int(section.get("height", 0))
+        alt_text = str(section.get("alt_text", ""))
+        return MapPreviewInfo(asset_path, (preview_width, preview_height), alt_text)
+
+    def _parse_interaction(self: HexaRenderer, section: object) -> InteractionCues:
+        if not isinstance(section, Mapping):
+            return InteractionCues.default()
+        primary = str(section.get("primary", ""))
+        secondary = str(section.get("secondary", ""))
+        hints = self._coerce_string_iterable(section.get("hints"))
+        return InteractionCues(primary=primary, secondary=secondary, hints=hints)
