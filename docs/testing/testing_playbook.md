@@ -30,7 +30,7 @@ This playbook explains how each testing style is applied and which automation ta
 - **Execution:** Run `task test:bdd` or target individual features with `uv run pytest tests/features/<feature>.py`.
 - **Backgrounds & Fixtures:** Use `Background` sections or reusable fixtures to provision worlds, processors, and entity scaffolding so each scenario remains declarative.
 - **Event Assertions:** Subscribe to engine events within step definitions to capture payloads for verification instead of asserting on mocks.
-- **Reference:** See `tests/features/bot_movement.feature` and `tests/features/test_bot_movement_bdd.py` for an end-to-end movement example. Additional authoring guidance lives in `docs/testing/bdd_playbook.md`.
+- **Reference:** See `tests/features/bot_movement.feature` and `tests/features/test_bot_movement_bdd.py` for an end-to-end movement example. Additional authoring guidance lives in `docs/testing/bdd_playbook.md`, and initiative history is stored under `docs/initiatives/archive/0004-behavior-driven-development.md`.
 
 ## Property-Based Testing (`tests/property/`)
 
