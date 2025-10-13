@@ -26,9 +26,11 @@ This playbook explains how each testing style is applied and which automation ta
 ## Behavior-Driven Development (`tests/features/`)
 
 - **Purpose:** Express player-visible behavior via Gherkin scenarios executed with `pytest-bdd`.
-- **Structure:** Feature files live alongside step definition modules. Steps must integrate with real engine services (e.g., `GameWorld`, `EventBus`).
+- **Structure:** Feature files live alongside step definition modules. Steps must integrate with real engine services (e.g., `GameWorld`, `EventBus`) and exercise production systems such as `MovementSystem`.
 - **Execution:** Run `task test:bdd` or target individual features with `uv run pytest tests/features/<feature>.py`.
-- **Reference:** See `tests/features/test_bot_movement_bdd.py` for an end-to-end move scheduling example.
+- **Backgrounds & Fixtures:** Use `Background` sections or reusable fixtures to provision worlds, processors, and entity scaffolding so each scenario remains declarative.
+- **Event Assertions:** Subscribe to engine events within step definitions to capture payloads for verification instead of asserting on mocks.
+- **Reference:** See `tests/features/bot_movement.feature` and `tests/features/test_bot_movement_bdd.py` for an end-to-end movement example. Additional authoring guidance lives in `docs/testing/bdd_playbook.md`.
 
 ## Property-Based Testing (`tests/property/`)
 

@@ -14,6 +14,9 @@ globs: tests/**/*.py, src/**/*.py, *.md, *.toml, *.yaml, *.json
 ## 6.2 Test-Driven Development (TDD)
 
 * **Mandate:** All game logic in `src/hexa_core/engine/` MUST be developed via a strict TDD workflow using [`spec-kit`](https://github.com/github/spec-kit). See [spec-kit documentation](https://github.com/github/spec-kit).
+* **Two-Tier Coverage:** Acceptance behaviors and engine internals are validated through complementary suites.
+  * **Behavior-Level (BDD):** Author Gherkin scenarios in `tests/features/` with `pytest-bdd`, wiring steps to real engine services. Execute via `task test:bdd`.
+  * **Unit-Level (Spec):** Keep deterministic `spec-kit` specs in `tests/spec/` to exercise individual systems. Execute via `task test:spec` or the full `task test:unit` aggregate.
 
 ## 6.3 Code Quality & Automation
 

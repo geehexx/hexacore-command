@@ -1,7 +1,7 @@
 # Initiative 0004: Behavior-Driven Development with pytest-bdd
 
 * **Objective:** Introduce Behavior-Driven Development (BDD) for feature-level testing to improve clarity, collaboration, and ensure tests are aligned with user-facing requirements.
-* **Status:** In Progress
+* **Status:** Complete
 
 ## Plan
 
@@ -28,6 +28,7 @@
 ### Document Practices
 
 * Capture BDD authoring guidance in the living documentation set alongside CodSpeed usage notes.
+  * Publish a dedicated `docs/testing/bdd_playbook.md` and reference it from the testing playbook.
 
 ## TODO
 
@@ -44,7 +45,7 @@
 
 * The `pytest-bdd` dependency remains in the development toolchain.
 * `.windsurf/rules/06_testing_and_tooling.md` calls out the two-tiered strategy that includes BDD coverage.
-* `tests/features/bot_movement.feature` and `tests/features/test_bot_movement_bdd.py` exercise engine event scheduling without placeholders.
+* `tests/features/bot_movement.feature` and `tests/features/test_bot_movement_bdd.py` exercise engine movement processing without placeholders.
 * Living documentation references (BDD playbook plus CodSpeed benchmarking guide) are published and linked from initiative artifacts.
 
 ## Next Steps
