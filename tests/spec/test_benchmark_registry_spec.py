@@ -42,6 +42,16 @@ def describe_benchmark_registry_registration() -> None:
         assert registry.names == ("alpha",)
         assert registry.get("alpha") is alpha
 
+    def it_supports_decorator_registration() -> None:
+        registry = BenchmarkRegistry()
+
+        @registry.register("alpha")
+        def alpha() -> int:
+            return 1
+
+        assert registry.names == ("alpha",)
+        assert registry.get("alpha") is alpha
+
 
 def describe_benchmark_registry_duplicate_protection() -> None:
     def it_prevents_duplicate_registration() -> None:
@@ -53,6 +63,21 @@ def describe_benchmark_registry_duplicate_protection() -> None:
         registry.register("alpha", alpha)
         with pytest.raises(ValueError):
             registry.register("alpha", alpha)
+
+    def it_requires_names_for_direct_registration() -> None:
+        registry = BenchmarkRegistry()
+
+        def alpha() -> int:
+            return 1
+
+        with pytest.raises(ValueError):
+            registry.register(func=alpha)
+
+    def it_requires_names_for_decorator_usage() -> None:
+        registry = BenchmarkRegistry()
+
+        with pytest.raises(ValueError):
+            registry.register()
 
 
 def describe_benchmark_registry_execution() -> None:
@@ -73,6 +98,22 @@ def describe_benchmark_registry_execution() -> None:
 
         assert results == {"alpha": 1, "beta": 2}
         assert [call.name for call in runner.calls] == ["alpha", "beta"]
+
+    def it_runs_registered_benchmarks_with_default_runner() -> None:
+        registry = BenchmarkRegistry()
+
+        executed: list[str] = []
+
+        def alpha() -> int:
+            executed.append("alpha")
+            return 1
+
+        registry.register("alpha", alpha)
+
+        results = registry.run_all()
+
+        assert results == {"alpha": 1}
+        assert executed == ["alpha"]
 
     def it_runs_benchmarks_with_pytest_style_runner() -> None:
         registry = BenchmarkRegistry()

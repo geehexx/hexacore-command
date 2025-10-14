@@ -16,8 +16,8 @@ CodSpeed integrates with pytest to provide statistically meaningful benchmark ru
 ## Core Concepts
 
 - **Benchmark Registry:** `BenchmarkRegistry` in `src/hexa_core/engine/benchmarking.py` manages benchmark callables. It exposes `run_with_pytest_codspeed()` so individual benchmarks can reuse CodSpeed's runner in tests.
-- **Benchmark Suite Layout:** Benchmarks live under `tests/benchmarks/`. Register scenarios in Python modules and delegate execution to the registry.
-- **Task Automation:** The `Taskfile.yml` target `test:benchmarks` runs `pytest --codspeed -n auto tests/benchmarks/` to exercise all registered benchmarks in parallel.
+- **Benchmark Suite Layout:** Benchmarks live under `tests/benchmarks/`. Register scenarios in Python modules and delegate execution to the registry. The new `tests/benchmarks/test_world_process_codspeed.py` module demonstrates end-to-end ECS world processing benchmarks.
+- **Task Automation:** The `Taskfile.yml` targets `test:benchmarks` and `test:benchmarks:serial` run `pytest --codspeed` with and without `-n auto`, letting you toggle between parallel execution and deterministic debugging runs.
 
 ## Implementation Details
 
@@ -28,7 +28,7 @@ from hexa_core.engine.benchmarking import BenchmarkRegistry
 
 registry = BenchmarkRegistry()
 
-@registry.register
+@registry.register("world_process")
 def world_process():
     # perform the work to measure
     return engine.world.process()
@@ -46,12 +46,14 @@ def test_benchmark_registry_with_codspeed(benchmark):
 
 ```bash
 uv run pytest --codspeed -n auto tests/benchmarks/
+uv run pytest --codspeed tests/benchmarks/
 ```
 
 Or rely on Taskfile automation:
 
 ```bash
 task test:benchmarks
+task test:benchmarks:serial
 ```
 
 ### CI Integration
@@ -61,5 +63,5 @@ task test:benchmarks
 
 ## Code Examples
 
-- Reference implementation: `tests/spec/test_benchmark_registry_spec.py` validates `run_with_pytest_codspeed()` dispatch.
-- Use the registry to compose larger benchmark scenarios (ECS world processing, pathfinding) and call them from CodSpeed-enabled tests.
+- Reference implementation: `tests/spec/test_benchmark_registry_spec.py` validates `run_with_pytest_codspeed()` dispatch, including decorator-style registration safeguards.
+- Use the registry to compose larger benchmark scenarios (ECS world processing, pathfinding) and call them from CodSpeed-enabled tests. See `tests/benchmarks/test_world_process_codspeed.py` for a concrete example.

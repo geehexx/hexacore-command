@@ -7,6 +7,7 @@ from collections import deque
 from typing import cast
 
 import esper
+import pytest
 from hexa_core.engine.event_bus import EventBus
 from hexa_core.engine.world import GameWorld
 
@@ -36,6 +37,16 @@ def describe_event_bus() -> None:
         bus = EventBus()
 
         bus.publish("unhandled", {"value": 1})
+
+    def it_exposes_current_subscribers_as_tuple() -> None:
+        bus = EventBus()
+
+        def subscriber(_: str, __: dict[str, int]) -> None:
+            return None
+
+        bus.subscribe("example", subscriber)
+
+        assert bus.subscribers("example") == (subscriber,)
 
 
 def describe_game_world() -> None:
@@ -68,3 +79,15 @@ def describe_game_world() -> None:
         world.delete_entity(entity)
 
         assert world.context_name in esper.list_worlds()
+
+    def it_reenters_existing_context_without_switching() -> None:
+        world = GameWorld()
+
+        with world._activate_context(), world._activate_context():
+            world.create_entity()
+
+    def it_raises_attribute_error_for_unknown_delegates() -> None:
+        world = GameWorld()
+
+        with pytest.raises(AttributeError):
+            _ = world.non_existent_method  # type: ignore[attr-defined]

@@ -29,11 +29,15 @@ This project standardizes developer workflows with [Task](https://taskfile.dev/)
 
 - `task game:run` launches the renderer entrypoint (`python -m hexa_core.main`).
 - `task test:unit` executes the full `pytest` suite.
+- `task test:unit:parallel` runs spec-kit suites with `pytest-xdist` across available CPUs.
+- `task test:unit:cov` executes the full suite with coverage reporting enabled.
 - `task test:spec` focuses on the `spec-kit` driven scenarios in `tests/spec/`.
 - `task test:benchmarks` runs the CodSpeed-backed performance suite (`pytest --codspeed`).
+- `task test:benchmarks:serial` replays CodSpeed benchmarks without xdist when debugging.
 - `task coverage:report` enforces the ≥85 % coverage threshold with `pytest --cov`.
 - `task lint:all` runs Ruff, MyPy, and PyMarkdown in sequence.
-- `task security:audit` runs `pip-audit` against project dependencies.
+- `task audit:deps` runs the hardened `pip-audit` check (ignoring GHSA-4xh5-x5gv-qwph per policy).
+- `task security:audit` delegates to `task audit:deps` for CI integration.
 - `task ci:check` chains `task lint:all` and `task test:unit` to mirror CI expectations.
 - `task ci:benchmarks` executes the benchmark-only validation path.
 

@@ -25,6 +25,11 @@ tasks:
     cmds:
       - "{{.UV}} run pytest -n auto tests/spec/"
 
+  test:unit:cov:
+    desc: Run unit suite with coverage reporting.
+    cmds:
+      - "{{.UV}} run pytest --cov=src/hexa_core --cov-report=term-missing"
+
   test:spec:
     desc: Execute only spec-kit style tests in tests/spec/.
     cmds:
@@ -40,10 +45,15 @@ tasks:
     cmds:
       - "{{.UV}} run pytest --codspeed -n auto tests/benchmarks/"
 
+  test:benchmarks:serial:
+    desc: Run CodSpeed benchmarks without parallelization for debugging.
+    cmds:
+      - "{{.UV}} run pytest --codspeed tests/benchmarks/"
+
   coverage:report:
     desc: Generate a coverage report with enforced thresholds.
-    cmds:
-      - "{{.UV}} run pytest --cov=src/hexa_core --cov-report=term-missing"
+    deps:
+      - test:unit:cov
 
   test:property:
     desc: Execute property-based tests.
@@ -78,10 +88,15 @@ tasks:
       - lint:mypy
       - lint:markdown
 
-  security:audit:
-    desc: Audit project dependencies for known vulnerabilities.
+  audit:deps:
+    desc: Audit dependencies for vulnerabilities with pip-audit.
     cmds:
       - "{{.UV}} run pip-audit --ignore-vuln GHSA-4xh5-x5gv-qwph"
+
+  security:audit:
+    desc: Audit project dependencies for known vulnerabilities.
+    deps:
+      - audit:deps
 
   ci:pre-commit:
     desc: Run all pre-commit hooks across the repository.

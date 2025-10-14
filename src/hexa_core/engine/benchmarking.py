@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Self
+from typing import Self, overload
 
 BenchmarkCallable = Callable[[], object]
 BenchmarkRunner = Callable[[BenchmarkCallable], object]
@@ -15,11 +15,40 @@ class BenchmarkRegistry:
     def __init__(self: Self) -> None:
         self._benchmarks: dict[str, BenchmarkCallable] = {}
 
-    def register(self: Self, name: str, func: BenchmarkCallable) -> None:
-        """Register ``func`` under ``name`` if not already taken."""
-        if name in self._benchmarks:
-            raise ValueError(f"Benchmark '{name}' is already registered.")
-        self._benchmarks[name] = func
+    @overload
+    def register(self: Self, name: str, func: BenchmarkCallable) -> BenchmarkCallable: ...
+
+    @overload
+    def register(self: Self, name: str) -> Callable[[BenchmarkCallable], BenchmarkCallable]: ...
+
+    def register(
+        self: Self,
+        name: str | None = None,
+        func: BenchmarkCallable | None = None,
+    ) -> BenchmarkCallable | Callable[[BenchmarkCallable], BenchmarkCallable]:
+        """Register ``func`` under ``name``.
+
+        Can be used either as ``register("name", func)`` or ``@register("name")``.
+        """
+
+        def _perform_registration(target_name: str, target_func: BenchmarkCallable) -> BenchmarkCallable:
+            if target_name in self._benchmarks:
+                raise ValueError(f"Benchmark '{target_name}' is already registered.")
+            self._benchmarks[target_name] = target_func
+            return target_func
+
+        if func is not None:
+            if name is None:
+                raise ValueError("Benchmark name must be provided when registering directly.")
+            return _perform_registration(name, func)
+
+        if name is None:
+            raise ValueError("Benchmark name must be provided for decorator usage.")
+
+        def decorator(target: BenchmarkCallable) -> BenchmarkCallable:
+            return _perform_registration(name, target)
+
+        return decorator
 
     def get(self: Self, name: str) -> BenchmarkCallable:
         """Return the function associated with ``name``."""
@@ -34,6 +63,7 @@ class BenchmarkRegistry:
         """Execute every registered benchmark via ``runner``."""
 
         def _default_runner(func: BenchmarkCallable) -> object:
+            """Execute ``func`` directly when no explicit runner is provided."""
             return func()
 
         effective_runner: BenchmarkRunner = runner or _default_runner

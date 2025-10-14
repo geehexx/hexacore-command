@@ -24,7 +24,10 @@ globs: tests/**/*.py, src/**/*.py, *.md, *.toml, *.yaml, *.json
 * **Automation:** Use the Taskfile targets to execute repeatable workflows:
   * `task lint:all` runs Ruff, MyPy, and PyMarkdown in sequence.
   * `task lint:complexity` runs Radon complexity analysis.
-  * `task test:unit` runs the full pytest suite.
+  * `task test:unit` runs the full pytest suite (`task test:unit:parallel` accelerates spec-kit suites via `pytest-xdist`).
+  * `task test:unit:cov` (or `task coverage:report`) produces coverage reports that must remain ≥85%.
+  * `task test:benchmarks` executes CodSpeed in parallel, while `task test:benchmarks:serial` provides a deterministic fallback during investigations.
+  * `task audit:deps` runs the hardened `pip-audit` invocation (referenced by `task security:audit`).
   * `task ci:check` chains linting and unit tests for CI validation.
   * `task ci:benchmarks` runs the benchmark suite when performance validation is required.
 * **Self-Validation:** Contributors MUST execute the relevant Taskfile targets locally (tests, benchmarks, or linting) before delivering checkpoints or status summaries.
