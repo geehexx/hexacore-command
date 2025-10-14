@@ -8,6 +8,10 @@ assets for Initiative 0002 reside in `docs/initiatives/artifacts/0002-mvp-ui-imp
 Once an initiative is implemented and its living documentation is updated, archive both the initiative brief and its
 artifacts according to the documentation lifecycle.
 
+**Archived Initiatives**
+
+- `docs/initiatives/archive/0006-arcade-renderer-integration.md`
+
 ## Archiving Procedure
 
 Follow these steps whenever closing an initiative:
