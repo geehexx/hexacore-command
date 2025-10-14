@@ -5,7 +5,7 @@ description: complete arcade renderer integration and gameplay ui
 # Initiative 0006: Arcade Renderer Integration & Gameplay UI Delivery
 
 * **Objective:** Deliver a playable Arcade front-end that coordinates menu, mission briefing, and gameplay scenes with the engine event bus.
-* **Status:** Proposed
+* **Status:** Completed
 
 ## Deliverables
 
@@ -32,15 +32,26 @@ description: complete arcade renderer integration and gameplay ui
 
 ## Implementation Roadmap
 
-* [ ] **Task 1:** Create Arcade window launcher (`src/hexa_core/renderer/app.py`) and wire
+* [x] **Task 1:** Create Arcade window launcher (`src/hexa_core/renderer/app.py`) and wire
   `HexaRenderer.run()`.
-* [ ] **Task 2:** Implement GUI widgets for mission briefing objectives, map preview, and
+* [x] **Task 2:** Implement GUI widgets for mission briefing objectives, map preview, and
   interaction prompts.
-* [ ] **Task 3:** Define gameplay scene view models and render placeholder layout.
-* [ ] **Task 4:** Connect renderer-engine events for mission briefing acceptance and gameplay
+* [x] **Task 3:** Define gameplay scene view models and render placeholder layout.
+* [x] **Task 4:** Connect renderer-engine events for mission briefing acceptance and gameplay
   activation.
-* [ ] **Task 5:** Add spec-kit coverage for renderer launcher and gameplay transition states.
-* [ ] **Task 6:** Document gameplay renderer architecture in `docs/renderer_gameplay.md`.
+* [x] **Task 5:** Add spec-kit coverage for renderer launcher and gameplay transition states.
+* [x] **Task 6:** Document gameplay renderer architecture in `docs/renderer_gameplay.md`.
+
+## Completion Notes
+
+* `RendererApp` now bootstraps the Arcade window, with mission briefing and gameplay views surfaced
+  through adapter classes in `src/hexa_core/renderer/arcade_views.py`.
+* Renderer events are consolidated under `src/hexa_core/renderer/events.py` to maintain a clear
+  contract with the engine event bus.
+* Spec-kit coverage in `tests/spec/test_renderer_app_spec.py` validates event wiring and view
+  transitions.
+* Documentation updates include `docs/renderer.md` and the new `docs/renderer_gameplay.md` detailing
+  launcher, view adapters, and event flow.
 
 ## References
 

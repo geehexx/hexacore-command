@@ -13,7 +13,7 @@ tasks:
   game:run:
     desc: Launch the Hexa-Core Command renderer entrypoint.
     cmds:
-      - "{{.UV}} run python -m hexa_core.main"
+      - "{{.UV}} run python -m hexa_core.renderer.app"
 
   test:unit:
     desc: Run the full pytest suite, including spec-kit specs.

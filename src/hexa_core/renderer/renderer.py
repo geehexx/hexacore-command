@@ -174,7 +174,7 @@ class GameplayView:
 
 
 class HexaRenderer:
-    """Placeholder renderer that will eventually integrate with Arcade."""
+    """Renderer state machine decoupled from Arcade runtime."""
 
     def __init__(self: HexaRenderer) -> None:
         self.current_state = RendererState.MAIN_MENU
@@ -190,8 +190,7 @@ class HexaRenderer:
 
     def run(self: HexaRenderer) -> None:
         """Execute the render loop."""
-        # TODO: Implement Arcade window and rendering pipeline.
-        raise NotImplementedError("Renderer run loop not yet implemented")
+        raise RuntimeError("HexaRenderer.run() is managed by RendererApp")
 
     def build_main_menu(self: HexaRenderer) -> MainMenuView:
         options = (

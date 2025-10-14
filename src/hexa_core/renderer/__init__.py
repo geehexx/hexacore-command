@@ -2,4 +2,7 @@
 
 __all__ = [
     "renderer",
+    "app",
+    "events",
+    "arcade_views",
 ]

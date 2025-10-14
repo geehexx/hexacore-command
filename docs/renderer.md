@@ -5,16 +5,16 @@
 | Key | Value |
 | --- | --- |
 | Topic | Arcade Renderer State Machine |
-| Keywords | renderer, state machine, main menu, mission briefing, gameplay layout |
+| Keywords | renderer, state machine, mission briefing, gameplay layout, arcade views |
 | Related ADRs | [ADR-0002](./decisions/0002-implement-ecs-pattern.md), [ADR-0003](./decisions/0003-implement-event-bus.md) |
 | Key Libraries | [Arcade](https://api.arcade.academy/en/latest/) |
 
 ## Overview
 
 The renderer provides Arcade-facing presentation for Hexa-Core Command while honoring the engine
-encapsulation rules. The current implementation spans the pre-game flows (main menu and mission
-briefing) and now exposes deterministic gameplay layout models that downstream Arcade wiring can
-consume.
+encapsulation rules. The current implementation includes the Arcade launcher, state-driven view
+adapters, pre-game flows (main menu and mission briefing), and deterministic gameplay layout models
+that downstream Arcade wiring can consume.
 
 ## Core Concepts
 
@@ -39,6 +39,13 @@ consume.
     configuration, bot status entries, and core control buttons.
   - Remain pure data with no Arcade dependencies, enabling spec-kit coverage while UI rendering is
     still forthcoming.
+- RendererApp and Arcade view adapters
+  - `create_renderer_app()` constructs a windowed Arcade runtime that hosts the `HexaRenderer`
+    state machine and event bus wiring.
+  - View adapters in `src/hexa_core/renderer/arcade_views.py` convert pure dataclasses into
+    `arcade.View` subclasses for menu, briefing, and gameplay scenes.
+  - `src/hexa_core/renderer/events.py` centralizes renderer event channel names used by the
+    engine event bus to coordinate state transitions.
 
 ## Implementation Details
 
@@ -49,11 +56,12 @@ consume.
     while preserving determinism for tests.
   - `proceed_to_gameplay()` now assembles a `GameplayView` from the active `MissionBriefingView`,
     stores it on `gameplay_view`, clears briefing state, and shifts the renderer into `GAMEPLAY`.
-- The renderer remains Arcade-agnostic; UI structures are pure dataclasses, facilitating spec-kit
-  tests (`tests/spec/test_renderer_spec.py`) that drive incremental feature delivery under TDD.
-  - New specs assert objective wrapping, preview metadata, interaction cue formatting, gameplay
-    transition behavior, and default gameplay layout construction to guard regressions across UI
-    stages.
+- `src/hexa_core/renderer/app.py` wraps the renderer state machine with the Arcade runtime,
+  registers event bus handlers, and exposes a `main()` entrypoint for Taskfile and `python -m`
+  execution.
+- Renderer views remain Arcade-agnostic in tests thanks to the adapter pattern. Specs cover
+  both the pure state machine (`tests/spec/test_renderer_spec.py`) and the launcher/event wiring
+  (`tests/spec/test_renderer_app_spec.py`).
 
 ## Code Examples
 
