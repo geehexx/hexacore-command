@@ -284,6 +284,15 @@ class ScriptRunner:
                 return left_value == right_value
             return left_value != right_value
         if operator in _COMPARISON_OPERATORS:
+            if isinstance(left_value, str) and isinstance(right_value, str):
+                if operator == "<":
+                    return left_value < right_value
+                if operator == "<=":
+                    return left_value <= right_value
+                if operator == ">":
+                    return left_value > right_value
+                if operator == ">=":
+                    return left_value >= right_value
             left_int = self._require_int(left_value)
             right_int = self._require_int(right_value)
             if operator == "<":
