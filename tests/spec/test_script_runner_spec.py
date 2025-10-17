@@ -78,3 +78,22 @@ def describe_script_runner() -> None:
 
         with pytest.raises(RuntimeError):
             runner.execute({"variables": {}})
+
+    def it_handles_string_comparisons() -> None:
+        runner = ScriptRunner()
+        runner.load(
+            """
+            SET "a" "zulu"
+            SET "b" "alpha"
+            IF a > b THEN SET "result" 1
+            IF a < b THEN SET "result" 0
+            END
+            """
+        )
+        context: dict[str, object] = {"variables": {"result": -1}}
+
+        runner.execute(context)
+
+        variables = context["variables"]
+        assert isinstance(variables, dict)
+        assert variables["result"] == 1
